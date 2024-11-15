@@ -1,0 +1,9 @@
+/* Gris moderno personalizado para el fondo */
+.custom-gray {
+    background-color: #f7f7f7; /* Gris ultra claro */
+}
+
+/* Tono de gris oscuro para el texto */
+.custom-text {
+    color: #333333; /* Gris oscuro, casi negro */
+}

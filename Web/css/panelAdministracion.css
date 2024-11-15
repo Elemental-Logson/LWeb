@@ -1,0 +1,76 @@
+/* Estilo del Sidebar */
+#sidebar {
+    width: 250px;
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+}
+#sidebar .nav-link:hover {
+    background-color: #495057; /* Un color más claro que el fondo */
+    border-radius: 5px;       /* Esquinas redondeadas para el hover */
+}
+
+/* Contenido principal al lado del sidebar */
+#main-content {
+    margin-left: 250px; /* Ocupa el espacio del sidebar */
+    width: calc(100% - 250px); /* Resta el ancho del sidebar */
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+/* Estilo del botón tirador */
+#toggle-sidebar {
+    position: fixed;
+    top: 50%;
+    left: 250px;
+    transform: translateY(-50%);
+    z-index: 1100;
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
+    color: white;
+    border-radius: 0 5px 5px 0;
+    padding: 5px;
+    width: 40px;
+    height: 40px;
+    transition: left 0.3s;
+}
+
+/* Ocultar el botón en pantallas grandes */
+@media (min-width: 992px) {
+    #toggle-sidebar {
+        display: none;
+    }
+
+    /* Asegurarse de que el sidebar esté visible en pantallas grandes */
+    #sidebar {
+        transform: translateX(0);
+    }
+
+    #main-content {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+}
+
+/* Ajuste cuando el sidebar está oculto */
+#sidebar.active {
+    transform: translateX(-100%);
+}
+
+#sidebar.active + #toggle-sidebar {
+    left: 0;
+}
+
+#sidebar.active + #toggle-sidebar + #main-content {
+    margin-left: 0;
+    width: 100%;
+}
+/* Estado seleccionado */
+#sidebar .nav-link.active {
+    background-color: #007bff; /* Color de selección, por ejemplo, azul */
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;        /* Resalta el texto */
+}

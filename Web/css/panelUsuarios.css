@@ -1,0 +1,31 @@
+    /* Esconde la tabla en pantallas pequeñas */
+    @media (max-width: 768px) {
+      .table-responsive {
+        display: none;
+      }
+      .user-card {
+        display: block;
+        margin-bottom: 1rem;
+      }
+      /* Botón flotante más accesible en móvil */
+      .btn-mobile {
+        width: 100%;
+        font-size: 18px;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 100;
+        padding: 15px;
+        max-width: 400px;
+      }
+    }
+    /* Esconde las tarjetas en pantallas grandes */
+    @media (min-width: 769px) {
+      .user-card {
+        display: none;
+      }
+    }
+    /* Añadimos un margen inferior a la tabla para que no se solape con el botón flotante */
+    .table-responsive {
+      margin-bottom: 70px; /* Deja espacio suficiente para el botón flotante */
+    }
