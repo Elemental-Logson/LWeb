@@ -1,0 +1,13 @@
+# Permitir acceso al archivo .htaccess
+<Files .htaccess>
+  Order Allow,Deny
+  Deny from all
+</Files>
+
+# Establecer el archivo predeterminado como login.php
+DirectoryIndex login.php
+
+# Deshabilitar el listado de directorios
+Options -Indexes
+
+

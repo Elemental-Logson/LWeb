@@ -84,6 +84,14 @@
                         <label for="userEmail" class="form-label">Email</label>
                         <input type="email" class="form-control" id="userEmail" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="userEmail" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="contraseña" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userEmail" class="form-label">Confirmar Contraseña</label>
+                        <input type="password" class="form-control" id="confirmarContraseña" required>
+                    </div>
                     <button type="submit" class="btn btn-primary">Añadir Usuario</button>
                 </form>
             </div>
