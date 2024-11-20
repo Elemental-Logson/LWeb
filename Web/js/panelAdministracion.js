@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Función para cargar contenido HTML externo en main-content
-function loadContent(url) {
+function loadContent(url, element) {
     fetch(url)
         .then(response => {
             if (!response.ok) {
@@ -39,7 +39,11 @@ function loadContent(url) {
             return response.text();
         })
         .then(html => {
+            // Actualizar el contenido principal
             document.getElementById("main-content").innerHTML = html;
+
+            // Marcar el enlace seleccionado como activo
+            setActiveLink(element);
         })
         .catch(error => {
             console.error(error);
@@ -47,61 +51,36 @@ function loadContent(url) {
         });
 }
 
-// Añadir listeners a cada enlace del sidebar
-document.getElementById("dashboard-link").addEventListener("click", function(event) {
-    event.preventDefault();
-    loadContent("../php/panelAdministracion/panelDashboard.php"); // Ruta al HTML de Dashboard
-});
-
-document.getElementById("usuarios-link").addEventListener("click", function(event) {
-    event.preventDefault();
-    loadContent("../php/panelAdministracion/panelUsuarios.php"); // Ruta al HTML de Usuarios
-});
-
-document.getElementById("escaner-link").addEventListener("click", function(event) {
-    event.preventDefault();
-    loadContent("../php/panelAdministracion/panelEscaner.php"); // Ruta al HTML de Escaner
-});
-
-document.getElementById("configuracion-link").addEventListener("click", function(event) {
-    event.preventDefault();
-    loadContent("../php/panelAdministracion/panelConfiguracion.php"); // Ruta al HTML de Configuración
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Función para cargar contenido HTML externo en main-content
-    function loadContent(url) {
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Error al cargar el contenido");
-                }
-                return response.text();
-            })
-            .then(html => {
-                document.getElementById("main-content").innerHTML = html;
-            })
-            .catch(error => {
-                console.error(error);
-                document.getElementById("main-content").innerHTML = "<p>Error al cargar el contenido</p>";
-            });
-    }
-    // Gestión de la selección en el sidebar
-    function setActiveLink(link) {
-        // Remover la clase active de todos los enlaces
-        const links = document.querySelectorAll("#sidebar .nav-link");
-        links.forEach(item => item.classList.remove("active"));
-
-        // Agregar la clase active al enlace clickeado
-        link.classList.add("active");
-    }
-    // Añadir listeners a cada enlace del sidebar
-    document.querySelectorAll("#sidebar .nav-link").forEach(link => {
-        link.addEventListener("click", function (event) {
-            event.preventDefault();
-            setActiveLink(this); // Marcar como activo el enlace clickeado
-            const url = this.getAttribute("data-url"); // Leer la URL desde data-url
-            loadContent(url); // Cargar el contenido HTML
-        });
+// Función para establecer el enlace activo
+function setActiveLink(activeLink) {
+    // Eliminar la clase 'active' de todos los enlaces
+    const links = document.querySelectorAll("#sidebar .nav-link");
+    links.forEach(link => {
+        link.classList.remove("active");
     });
+
+    // Añadir la clase 'active' al enlace clickeado
+    activeLink.classList.add("active");
+}
+
+// Añadir listeners a cada enlace del sidebar
+document.getElementById("dashboard-link").addEventListener("click", function (event) {
+    event.preventDefault();
+    loadContent("../php/panelAdministracion/panelDashboard.php", this); // Ruta al HTML de Dashboard
 });
+
+document.getElementById("usuarios-link").addEventListener("click", function (event) {
+    event.preventDefault();
+    loadContent("../php/panelAdministracion/panelUsuarios.php", this); // Ruta al HTML de Usuarios
+});
+
+document.getElementById("escaner-link").addEventListener("click", function (event) {
+    event.preventDefault();
+    loadContent("../php/panelAdministracion/panelEscaner.php", this); // Ruta al HTML de Escaner
+});
+
+document.getElementById("transacciones-link").addEventListener("click", function (event) {
+    event.preventDefault();
+    loadContent("../php/panelAdministracion/panelTransacciones.php", this); // Ruta al HTML de Transacciones
+});
+

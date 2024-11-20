@@ -21,9 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['username'] = $username;
         // Redirigir al panel de control dependiendo del rol
         if ($users[$username]['role'] === 'admin') {
-            header('Location: panelAdministracion.php'); // Redirigir al panel de admin
+            header('Location: dashboard.php');
         } else {
-            header('Location: VerGastos.php');  // Redirigir al panel de usuario
+            header('Location: dashboard.php');
         }
         exit;
     }

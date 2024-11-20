@@ -7,7 +7,3 @@
 # Establecer el archivo predeterminado como login.php
 DirectoryIndex login.php
 
-# Deshabilitar el listado de directorios
-Options -Indexes
-
-
