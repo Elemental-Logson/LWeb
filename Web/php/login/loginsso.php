@@ -4,7 +4,7 @@ session_start();
 $realm = 'SSO';  // Nombre del realm
 $client_id = 'SSO';  // ID del cliente registrado en Keycloak
 $client_secret = 'RtrWyqSSa3lrCopGjjLh5NHWGKrHtMtY';  // Secreto del cliente
-$redirect_uri = 'http://localhost/lweb/Web/php/callback.php';  // URL de callback
+$redirect_uri = 'http://localhost/lweb/Web/php/login/callback.php';  // URL de callback
 
 // URL de Keycloak para la autenticación
 $keycloak_url = 'http://10.11.0.96:8080//realms/' . $realm . '/protocol/openid-connect/auth';
