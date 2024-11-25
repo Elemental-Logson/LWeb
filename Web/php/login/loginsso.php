@@ -16,6 +16,4 @@ if (!isset($_SESSION['access_token'])) {
     header('Location: ' . $auth_url);
     exit;
 }
-
-echo 'Usuario autenticado correctamente.';
 ?>

@@ -4,6 +4,6 @@
   Deny from all
 </Files>
 
-# Establecer el archivo predeterminado como login.php
-DirectoryIndex login.php
+# Establecer el archivo predeterminado como loginUnificado.php
+DirectoryIndex loginUnificado.php
 

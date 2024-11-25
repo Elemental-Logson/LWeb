@@ -6,7 +6,7 @@ if (!isset($_SESSION['authToken'])) {
     // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login
     session_unset();  // Elimina todas las variables de sesión
     session_destroy(); // Destruye la sesión
-    header('Location: login.php'); // Redirige al login
+    header('Location: /lweb/Web/php/login/loginUnificado.php'); // Redirige al login
     exit;
 }
 ?>
@@ -59,7 +59,7 @@ if (!isset($_SESSION['authToken'])) {
                             Ver Perfil</a>
                     </li>
                     <li class="nav-item">
-                        <a href="./logout.php" class="nav-link text-white">
+                        <a href="../php/login/logout.php" class="nav-link text-white">
                             <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                         </a>
                     </li>
@@ -80,7 +80,8 @@ if (!isset($_SESSION['authToken'])) {
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <!-- Graficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/panelAdministracion.js"></script>
 </body>
 

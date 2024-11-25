@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Función para cargar contenido HTML externo en main-content
+// Función para cargar contenido HTML y JS externo en main-content
 function loadContent(url, element) {
     fetch(url)
         .then(response => {
@@ -42,6 +42,14 @@ function loadContent(url, element) {
             // Actualizar el contenido principal
             document.getElementById("main-content").innerHTML = html;
 
+            // Cargar y ejecutar cualquier archivo JS asociado
+            const scripts = document.querySelectorAll('#main-content script');
+            scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                newScript.text = script.text;
+                document.body.appendChild(newScript);
+            });
+
             // Marcar el enlace seleccionado como activo
             setActiveLink(element);
         })
@@ -53,13 +61,13 @@ function loadContent(url, element) {
 
 // Función para establecer el enlace activo
 function setActiveLink(activeLink) {
-    // Eliminar la clase 'active' de todos los enlaces
+    // Eliminar la clase "active" de todos los enlaces
     const links = document.querySelectorAll("#sidebar .nav-link");
     links.forEach(link => {
         link.classList.remove("active");
     });
 
-    // Añadir la clase 'active' al enlace clickeado
+    // Añadir la clase "active" al enlace clickeado
     activeLink.classList.add("active");
 }
 
@@ -83,4 +91,3 @@ document.getElementById("transacciones-link").addEventListener("click", function
     event.preventDefault();
     loadContent("../php/panelAdministracion/panelTransacciones.php", this); // Ruta al HTML de Transacciones
 });
-

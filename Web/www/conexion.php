@@ -1,4 +1,6 @@
 <?php
+// conexion.php
+
 // Configuración de la base de datos
 $host = "localhost";  // Dirección del servidor (puede ser una IP si no es local)
 $usuario = "root";    // Nombre de usuario de MySQL
@@ -12,11 +14,9 @@ try {
     // Establecer el modo de error de PDO
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    echo "Conexión exitosa";
+    // Si la conexión es exitosa, no se ejecutará esta línea, pero si hay error se lanza una excepción.
 } catch(PDOException $e) {
     echo "Conexión fallida: " . $e->getMessage();
+    die();  // Termina la ejecución si no hay conexión
 }
-
-// Cerrar la conexión
-$conn = null;
 ?>
