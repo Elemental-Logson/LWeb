@@ -1,18 +1,141 @@
+<style>
+    /* Contenedor de Slider */
+    .range-container {
+        position: relative;
+        width: 100%;
+        margin-top: 10px;
+        height: 8px;
+    }
+
+    .range-track {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 8px;
+        background: #ddd;
+        border-radius: 5px;
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 8px;
+        background: transparent;
+        position: absolute;
+        pointer-events: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+        pointer-events: all;
+        position: relative;
+        z-index: 3;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+        pointer-events: all;
+        position: relative;
+        z-index: 3;
+    }
+
+    /* Ajuste para el input de rango máximo detrás del rango mínimo */
+    input[type="range"]:nth-child(3) {
+        z-index: 2;
+    }
+
+    .range-inputs {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .range-inputs input {
+        width: 100%;
+    }
+
+    /* Contenedor que agrupa el slider y los inputs */
+    .range-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Media Queries para dispositivos pequeños */
+    @media (min-width: 576px) {
+        .range-wrapper {
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .range-inputs {
+            margin-top: 0;
+            margin-left: 10px;
+        }
+    }
+</style>
+
 <div class="container my-5">
-    <h1 class="mb-4">Gestión de Gastos</h1>
+    <!-- Título y botones -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h1>Gestión de Gastos</h1>
+        <div class="btn-group mt-3 mt-md-0">
+            <button id="apply-filters" class="btn btn-primary"><i class="bi bi-search"></i></button>
+            <button id="clear-filters" class="btn btn-danger"><i class="bi bi-x-circle"></i></button>
+        </div>
+    </div>
 
     <!-- Filtros -->
     <div class="row mb-4">
-        <div class="col-md-4">
-            <label for="filter-description" class="form-label">Descripción</label>
-            <input type="text" id="filter-description" class="form-control" placeholder="Filtrar por descripción">
+        <div class="col-12 col-md-3 mb-3 mb-md-0">
+            <div class="form-floating">
+                <input type="text" id="filter-description" class="form-control" placeholder="Filtrar por descripción">
+                <label for="filter-description">Descripción</label>
+            </div>
         </div>
-        <div class="col-md-4">
-            <label for="filter-month" class="form-label">Mes</label>
-            <input type="month" id="filter-month" class="form-control">
+        <div class="col-12 col-sm-6 col-md-2 mb-3 mb-md-0">
+            <div class="form-floating">
+                <input type="date" id="filter-start-date" class="form-control" placeholder="Fecha Inicio">
+                <label for="filter-start-date">Fecha Inicio</label>
+            </div>
         </div>
-        <div class="col-md-4 d-flex align-items-end">
-            <button id="apply-filters" class="btn btn-primary w-100">Aplicar Filtros</button>
+        <div class="col-12 col-sm-6 col-md-2 mb-3 mb-md-0">
+            <div class="form-floating">
+                <input type="date" id="filter-end-date" class="form-control" placeholder="Fecha Fin">
+                <label for="filter-end-date">Fecha Fin</label>
+            </div>
+        </div>
+        <div class="col-12 col-md-5">
+            <label for="filter-price-range" class="form-label">Rango de Precios (€)</label>
+            <div class="range-wrapper">
+                <div class="range-container">
+                    <!-- Fondo de la pista -->
+                    <div class="range-track"></div>
+                    <!-- Slider inferior (mínimo) -->
+                    <input type="range" id="filter-price-range" min="0" max="1000" step="10" value="0" oninput="updatePriceLabels()">
+                    <!-- Slider superior (máximo) -->
+                    <input type="range" id="filter-price-range-max" min="0" max="1000" step="10" value="1000" oninput="updatePriceLabels()">
+                </div>
+                <div class="range-inputs">
+                    <input type="number" id="price-min-input" class="form-control" value="0" min="0" max="1000" step="10" oninput="updateSliderFromInput()">
+                    <input type="number" id="price-max-input" class="form-control" value="1000" min="0" max="1000" step="10" oninput="updateSliderFromInput()">
+                </div>
+            </div>
         </div>
     </div>
 
@@ -39,19 +162,115 @@
             <!-- Botones dinámicos -->
         </ul>
     </nav>
-
-    <!-- Gráfico -->
-    <div class="my-5">
-        <canvas id="expense-chart" height="100"></canvas>
-    </div>
 </div>
 
 <script>
-    let expenses = []; // Array para almacenar los datos
-    let filteredExpenses = []; // Datos filtrados
-    const rowsPerPage = 10;
-    let currentPage = 1;
+    var expenses = [];
+    var filteredExpenses = [];
+    var rowsPerPage = 10;
+    var currentPage = 1;
 
+    // Obtener elementos del DOM
+    var priceMinSlider = document.getElementById('filter-price-range');
+    var priceMaxSlider = document.getElementById('filter-price-range-max');
+    var priceMinInput = document.getElementById('price-min-input');
+    var priceMaxInput = document.getElementById('price-max-input');
+
+    // Actualizar etiquetas del rango de precios
+    function updatePriceLabels() {
+        let minValue = parseInt(priceMinSlider.value);
+        let maxValue = parseInt(priceMaxSlider.value);
+
+        // Asegurarse de que los sliders no se crucen
+        if (minValue > maxValue) {
+            if (event.target === priceMinSlider) {
+                priceMinSlider.value = maxValue;
+                minValue = maxValue;
+            } else {
+                priceMaxSlider.value = minValue;
+                maxValue = minValue;
+            }
+        }
+
+        // Actualizar los valores de los inputs numéricos
+        priceMinInput.value = minValue;
+        priceMaxInput.value = maxValue;
+    }
+
+    // Función para actualizar sliders desde los inputs numéricos
+    function updateSliderFromInput() {
+        let minValue = parseInt(priceMinInput.value);
+        let maxValue = parseInt(priceMaxInput.value);
+
+        // Validar los límites y ajustar los valores si son inválidos
+        if (minValue < parseInt(priceMinSlider.min)) {
+            minValue = parseInt(priceMinSlider.min);
+        } else if (minValue > parseInt(priceMaxSlider.max)) {
+            minValue = parseInt(priceMaxSlider.max);
+        }
+
+        if (maxValue > parseInt(priceMaxSlider.max)) {
+            maxValue = parseInt(priceMaxSlider.max);
+        } else if (maxValue < parseInt(priceMinSlider.min)) {
+            maxValue = parseInt(priceMinSlider.min);
+        }
+
+        // Asegurarse de que los valores no se crucen
+        if (minValue > maxValue) {
+            minValue = maxValue;
+        }
+
+        // Actualizar sliders
+        priceMinSlider.value = minValue;
+        priceMaxSlider.value = maxValue;
+    }
+
+    // Aplicar filtros
+    document.getElementById('apply-filters').addEventListener('click', () => {
+        const descriptionFilter = document.getElementById('filter-description').value.toLowerCase();
+        const startDateFilter = document.getElementById('filter-start-date').value;
+        const endDateFilter = document.getElementById('filter-end-date').value;
+        const priceMinFilter = parseInt(priceMinSlider.value);
+        const priceMaxFilter = parseInt(priceMaxSlider.value);
+
+        filteredExpenses = expenses.filter(expense => {
+            const matchesDescription = expense.descripcion.toLowerCase().includes(descriptionFilter);
+            const matchesStartDate = startDateFilter ? new Date(expense.fecha) >= new Date(startDateFilter) : true;
+            const matchesEndDate = endDateFilter ? new Date(expense.fecha) <= new Date(endDateFilter) : true;
+            const matchesPrice = expense.monto >= priceMinFilter && expense.monto <= priceMaxFilter;
+
+            return matchesDescription && matchesStartDate && matchesEndDate && matchesPrice;
+        });
+
+        currentPage = 1; // Resetear a la primera página
+        renderTable();
+        renderPagination();
+    });
+
+    // Limpiar filtros
+    document.getElementById('clear-filters').addEventListener('click', () => {
+        // Resetear todos los campos de filtro
+        document.getElementById('filter-description').value = '';
+        document.getElementById('filter-start-date').value = '';
+        document.getElementById('filter-end-date').value = '';
+
+        // Resetear sliders y inputs numéricos
+        priceMinSlider.value = priceMinSlider.min;
+        priceMaxSlider.value = priceMaxSlider.max;
+        priceMinInput.value = priceMinSlider.min;
+        priceMaxInput.value = priceMaxSlider.max;
+
+        // Actualizar etiquetas del rango de precios
+        updatePriceLabels();
+
+        // Restablecer los gastos filtrados
+        filteredExpenses = expenses.slice();
+        currentPage = 1;
+        renderTable();
+        renderPagination();
+    });
+
+    // Función para cargar los gastos al iniciar
     async function fetchExpenses() {
         try {
             const response = await fetch('../php/CRUD/gastos/ver_facturaUsuario.php');
@@ -63,10 +282,9 @@
             }
 
             expenses = data;
-            filteredExpenses = data; // Inicialmente, no hay filtros
+            filteredExpenses = expenses.slice(); // Inicialmente, no hay filtros
             renderTable();
             renderPagination();
-            renderChart(); // Carga el gráfico global
         } catch (error) {
             console.error('Error al cargar los gastos:', error);
         }
@@ -113,95 +331,6 @@
         renderTable();
     }
 
-    // Aplicar filtros
-    document.getElementById('apply-filters').addEventListener('click', () => {
-        const descriptionFilter = document.getElementById('filter-description').value.toLowerCase();
-        const monthFilter = document.getElementById('filter-month').value;
-
-        filteredExpenses = expenses.filter(expense => {
-            const matchesDescription = expense.descripcion.toLowerCase().includes(descriptionFilter);
-            const matchesMonth = monthFilter ?
-                new Date(expense.fecha).toISOString().slice(0, 7) === monthFilter :
-                true;
-            return matchesDescription && matchesMonth;
-        });
-
-        currentPage = 1; // Resetear a la primera página
-        renderTable();
-        renderPagination();
-        renderChart(monthFilter); // Carga el gráfico específico
-    });
-
-    // Renderizar gráfico
-    function renderChart(selectedMonth = null) {
-        const ctx = document.getElementById('expense-chart').getContext('2d');
-
-        const groupedData = {};
-        if (selectedMonth) {
-            // Mostrar datos día a día dentro del mes seleccionado
-            filteredExpenses.forEach(expense => {
-                const date = new Date(expense.fecha);
-                const month = date.toISOString().slice(0, 7);
-                const day = date.toISOString().slice(0, 10);
-
-                if (month === selectedMonth) {
-                    if (!groupedData[day]) {
-                        groupedData[day] = 0;
-                    }
-                    groupedData[day] += parseFloat(expense.monto);
-                }
-            });
-        } else {
-            // Mostrar datos por mes globalmente
-            filteredExpenses.forEach(expense => {
-                const month = new Date(expense.fecha).toISOString().slice(0, 7);
-                if (!groupedData[month]) {
-                    groupedData[month] = 0;
-                }
-                groupedData[month] += parseFloat(expense.monto);
-            });
-        }
-
-        const labels = Object.keys(groupedData).sort();
-        const data = labels.map(label => groupedData[label]);
-
-        // Destruir gráfico anterior si existe
-        if (window.expenseChart) {
-            window.expenseChart.destroy();
-        }
-
-        window.expenseChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels,
-                datasets: [{
-                    label: selectedMonth ? 'Gastos por Día (€)' : 'Gastos por Mes (€)',
-                    data,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => `€${context.raw.toFixed(2)}`
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-    // Cargar datos al iniciar
+    // Inicialización de datos
     fetchExpenses();
 </script>
