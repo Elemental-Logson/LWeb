@@ -99,7 +99,33 @@
             <button id="clear-filters" class="btn btn-danger"><i class="bi bi-x-circle"></i></button>
         </div>
     </div>
-
+    <div class="row mb-4">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Gastos Totales (€)</h5>
+                    <p id="total-expenses" class="card-text fs-4">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Gastos del Mes (€)</h5>
+                    <p id="monthly-expenses" class="card-text fs-4">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="expenses-chart" class="w-100 h-auto" style="min-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Filtros -->
     <div class="row mb-4">
         <div class="col-12 col-md-3 mb-3 mb-md-0">
@@ -165,6 +191,13 @@
 </div>
 
 <script>
+    // fetchExpenses();
+    // Llamar a calculateTotals al cargar datos iniciales
+    fetchExpenses().then(() => {
+        calculateTotals(expenses); // Usar todos los datos al inicio
+        renderChart(filteredExpenses);
+    });
+
     var expenses = [];
     var filteredExpenses = [];
     var rowsPerPage = 10;
@@ -175,7 +208,8 @@
     var priceMaxSlider = document.getElementById('filter-price-range-max');
     var priceMinInput = document.getElementById('price-min-input');
     var priceMaxInput = document.getElementById('price-max-input');
-
+    // Inicializar gráfico
+    var expensesChart;
     // Actualizar etiquetas del rango de precios
     function updatePriceLabels() {
         let minValue = parseInt(priceMinSlider.value);
@@ -225,28 +259,6 @@
         priceMaxSlider.value = maxValue;
     }
 
-    // Aplicar filtros
-    document.getElementById('apply-filters').addEventListener('click', () => {
-        const descriptionFilter = document.getElementById('filter-description').value.toLowerCase();
-        const startDateFilter = document.getElementById('filter-start-date').value;
-        const endDateFilter = document.getElementById('filter-end-date').value;
-        const priceMinFilter = parseInt(priceMinSlider.value);
-        const priceMaxFilter = parseInt(priceMaxSlider.value);
-
-        filteredExpenses = expenses.filter(expense => {
-            const matchesDescription = expense.descripcion.toLowerCase().includes(descriptionFilter);
-            const matchesStartDate = startDateFilter ? new Date(expense.fecha) >= new Date(startDateFilter) : true;
-            const matchesEndDate = endDateFilter ? new Date(expense.fecha) <= new Date(endDateFilter) : true;
-            const matchesPrice = expense.monto >= priceMinFilter && expense.monto <= priceMaxFilter;
-
-            return matchesDescription && matchesStartDate && matchesEndDate && matchesPrice;
-        });
-
-        currentPage = 1; // Resetear a la primera página
-        renderTable();
-        renderPagination();
-    });
-
     // Limpiar filtros
     document.getElementById('clear-filters').addEventListener('click', () => {
         // Resetear todos los campos de filtro
@@ -268,6 +280,30 @@
         currentPage = 1;
         renderTable();
         renderPagination();
+    });
+    // Aplicar filtros
+    document.getElementById('apply-filters').addEventListener('click', () => {
+        const descriptionFilter = document.getElementById('filter-description').value.toLowerCase();
+        const startDateFilter = document.getElementById('filter-start-date').value;
+        const endDateFilter = document.getElementById('filter-end-date').value;
+        const priceMinFilter = parseInt(priceMinSlider.value);
+        const priceMaxFilter = parseInt(priceMaxSlider.value);
+        filteredExpenses = expenses.filter(expense => {
+            const matchesDescription = expense.descripcion.toLowerCase().includes(descriptionFilter);
+            const matchesStartDate = startDateFilter ? new Date(expense.fecha) >= new Date(startDateFilter) : true;
+            const matchesEndDate = endDateFilter ? new Date(expense.fecha) <= new Date(endDateFilter) : true;
+            const matchesPrice = expense.monto >= priceMinFilter && expense.monto <= priceMaxFilter;
+
+            return matchesDescription && matchesStartDate && matchesEndDate && matchesPrice;
+        });
+
+        currentPage = 1; // Resetear página
+        renderTable();
+        renderPagination();
+
+        // Actualizar totales y gráfico
+        calculateTotals(filteredExpenses);
+        renderChart(filteredExpenses);
     });
 
     // Función para cargar los gastos al iniciar
@@ -331,6 +367,142 @@
         renderTable();
     }
 
-    // Inicialización de datos
-    fetchExpenses();
+    // Graficos
+
+
+    function renderChart(data) {
+        const groupedData = groupExpensesByDate(data); // Agrupar por día
+        const chartData = prepareChartData(groupedData); // Preparar datos del gráfico
+
+        const ctx = document.getElementById('expenses-chart').getContext('2d');
+
+        // Si el gráfico ya existe, destrúyelo para actualizarlo
+        if (expensesChart) {
+            expensesChart.destroy();
+        }
+
+        // Crear nuevo gráfico
+        expensesChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false // Oculta la leyenda
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `€ ${tooltipItem.raw.toLocaleString('es-ES', {
+                            minimumFractionDigits: 2
+                        })}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true, // Barras apiladas por día
+                        title: {
+                            display: true,
+                            text: 'Fecha'
+                        }
+                    },
+                    y: {
+                        stacked: true, // Apilar valores de transacciones
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Monto (€)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    // Llamar a renderChart con datos filtrados o iniciales
+    fetchExpenses().then(() => {
+        renderChart(filteredExpenses); // Usar datos iniciales al cargar la página
+    });
+
+    function calculateTotals(data) {
+        // Calcular el total de todos los gastos
+        const total = data.reduce((sum, expense) => sum + parseFloat(expense.monto), 0);
+
+        // Calcular el total de los gastos del mes actual
+        const currentMonth = new Date().getMonth(); // Mes actual (0-11)
+        const currentYear = new Date().getFullYear(); // Año actual
+        const monthlyTotal = data
+            .filter(expense => {
+                const expenseDate = new Date(expense.fecha);
+                return (
+                    expenseDate.getMonth() === currentMonth &&
+                    expenseDate.getFullYear() === currentYear
+                );
+            })
+            .reduce((sum, expense) => sum + parseFloat(expense.monto), 0);
+
+        // Actualizar el DOM con formato decimal
+        document.getElementById('total-expenses').innerText = total.toLocaleString('es-ES', {
+            minimumFractionDigits: 2
+        });
+        document.getElementById('monthly-expenses').innerText = monthlyTotal.toLocaleString('es-ES', {
+            minimumFractionDigits: 2
+        });
+    }
+
+    function groupExpensesByDate(data) {
+        // Ordenar por fecha ascendente
+        const sortedData = data.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+        // Agrupar los datos por día
+        const groupedData = {};
+        sortedData.forEach(expense => {
+            const date = new Date(expense.fecha).toLocaleDateString('es-ES'); // Formatear fecha como dd/mm/yyyy
+            if (!groupedData[date]) {
+                groupedData[date] = [];
+            }
+            groupedData[date].push(expense);
+        });
+
+        return groupedData;
+    }
+
+
+    function prepareChartData(groupedExpenses) {
+        const labels = Object.keys(groupedExpenses); // Fechas como etiquetas
+        const datasets = [];
+
+        // Mapear cada transacción dentro de las fechas
+        const uniqueTransactions = new Set();
+        labels.forEach(date => {
+            groupedExpenses[date].forEach(expense => {
+                uniqueTransactions.add(expense.descripcion); // Recolectar descripciones únicas
+            });
+        });
+
+        // Crear un dataset por descripción
+        Array.from(uniqueTransactions).forEach((description, index) => {
+            const dataset = {
+                label: description,
+                data: labels.map(date => {
+                    const expensesForDate = groupedExpenses[date];
+                    const matchingExpense = expensesForDate.find(e => e.descripcion === description);
+                    return matchingExpense ? parseFloat(matchingExpense.monto) : 0; // Usar 0 si no hay coincidencia
+                }),
+                backgroundColor: `rgba(${index * 50 % 255}, ${index * 80 % 255}, ${index * 30 % 255}, 0.5)`,
+                borderColor: `rgba(${index * 50 % 255}, ${index * 80 % 255}, ${index * 30 % 255}, 1)`,
+                borderWidth: 1
+            };
+            datasets.push(dataset);
+        });
+
+        return {
+            labels,
+            datasets
+        };
+    }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
