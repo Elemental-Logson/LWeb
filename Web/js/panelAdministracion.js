@@ -91,3 +91,7 @@ document.getElementById("transacciones-link").addEventListener("click", function
     event.preventDefault();
     loadContent("../php/panelAdministracion/panelTransacciones.php", this); // Ruta al HTML de Transacciones
 });
+document.getElementById("tarjetas-link").addEventListener("click", function (event) {
+    event.preventDefault();
+    loadContent("../php/panelAdministracion/panelTarjetas.php", this); // Ruta al HTML de Tarjetas
+});

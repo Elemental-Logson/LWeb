@@ -78,7 +78,7 @@
             <td>${transaction.monto}</td>
             <td>${new Date(transaction.fecha).toLocaleDateString()}</td>
             <td>
-              <a href="../uploads/${transaction.factura}" target="_blank">Ver Factura</a>
+              <a href="../../img/${transaction.factura}" target="_blank">Ver Factura</a>
             </td>
           `;
                     expenseTableBody.appendChild(row);

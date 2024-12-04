@@ -1,16 +1,12 @@
 <?php
 session_start();
 
-$realm = 'SSO';  // Nombre del realm
-$client_id = 'SSO';  // ID del cliente registrado en Keycloak
-$client_secret = 'RtrWyqSSa3lrCopGjjLh5NHWGKrHtMtY';  // Secreto del cliente
-$redirect_uri = 'http://localhost/lweb/Web/php/login/callback.php';  // URL de callback
-$token_url = 'http://10.11.0.96:8080/realms/' . $realm . '/protocol/openid-connect/token';  // URL para obtener el token
+// Incluir el archivo de configuración
+require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/config.php');
 
 // Verificar si el código de autenticación está presente en la URL
 if (isset($_GET['code'])) {
     $code = $_GET['code'];
-
     // Preparar los datos para el POST
     $data = [
         'grant_type' => 'authorization_code',
@@ -60,4 +56,3 @@ if (isset($_GET['code'])) {
 } else {
     echo 'No se recibió el código de autenticación.';
 }
-?>

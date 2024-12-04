@@ -48,6 +48,10 @@ if (!isset($_SESSION['authToken'])) {
                         <a href="#" class="nav-link text-white" id="escaner-link"><i class="bi bi-bug"></i>
                             Escaner</a>
                     </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-white" id="tarjetas-link"><i class="bi bi-credit-card"></i>
+                            Tarjetas</a>
+                    </li>
                 </ul>
             </div>
             <!-- Perfil del usuario -->
@@ -83,6 +87,7 @@ if (!isset($_SESSION['authToken'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Graficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="../js/panelAdministracion.js"></script>
 </body>
 

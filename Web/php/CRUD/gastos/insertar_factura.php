@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validar archivo de factura
     if ($factura && $factura['error'] === UPLOAD_ERR_OK) {
-        $directorio_destino = __DIR__ . "/img/facturas/"; // Usa una ruta absoluta
+        $directorio_destino = $_SERVER['DOCUMENT_ROOT'] . '/LWeb/img/';
         $extension = strtolower(pathinfo($factura['name'], PATHINFO_EXTENSION));
         $extensiones_permitidas = ['jpg', 'jpeg', 'png', 'gif'];
 

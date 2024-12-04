@@ -304,7 +304,7 @@
                 <td>${expense.descripcion}</td>
                 <td>${expense.monto}</td>
                 <td>${new Date(expense.fecha).toLocaleDateString()}</td>
-                <td><a href="../uploads/${expense.factura}" target="_blank">Ver Factura</a></td>
+                <td><a href="../../img/${expense.factura}" target="_blank">Ver Factura</a></td>
             </tr>
         `;
             tableBody.insertAdjacentHTML('beforeend', row);
