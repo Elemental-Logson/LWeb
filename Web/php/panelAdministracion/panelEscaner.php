@@ -84,6 +84,62 @@
 <script>
     loadScan();
 
+
+
+    document.querySelector('.btn-primary.w-100').addEventListener('click', function() {
+        const targetRange = document.getElementById('targetRange').value;
+        const scanName = document.getElementById('scanName').value;
+        const portRange = document.getElementById('portRange').value || "1-1024";
+        const scanIntensity = document.getElementById('scanIntensity').value;
+        const scanType = document.getElementById('scanType').value;
+
+        // Validación básica
+        if (!targetRange || !scanName) {
+            alert("Por favor, completa todos los campos obligatorios.");
+            return;
+        }
+
+        // Construir el cuerpo de la solicitud
+        const requestBody = {
+            targetRange,
+            scanName,
+            portRange,
+            scanIntensity
+        };
+
+        // Determinar el endpoint según el tipo de escaneo
+        let endpoint = '';
+        if (scanType === 'ports_services') {
+            endpoint = '/scan/ports-services';
+        } else if (scanType === 'vulnerabilities') {
+            endpoint = '/scan/vulnerabilities';
+        }
+
+        // Realizar la solicitud a la API
+        fetch(`http://10.11.0.147:8000${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al realizar la solicitud');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Respuesta del servidor:', data);
+                alert("Escaneo iniciado con éxito.");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Hubo un problema al iniciar el escaneo.");
+            });
+    });
+
+
     function loadScan() {
         fetch('../php/CRUD/escaner/ver_Escaner.php')
             .then(response => response.json())
