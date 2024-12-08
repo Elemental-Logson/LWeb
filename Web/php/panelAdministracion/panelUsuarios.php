@@ -85,7 +85,10 @@
                         <td>
                             <button class="btn btn-primary btn-sm">Editar</button>
                             <button class="btn btn-danger btn-sm">Eliminar</button>
-                            <button class="btn btn-warning btn-sm" onclick="disableUser('${user.id}')">Deshabilitar</button>
+                            ${user.enabled ? 
+                                `<button class="btn btn-warning btn-sm" onclick="disableUser('${user.id}')">Deshabilitar</button>` :
+                                `<button class="btn btn-success btn-sm" onclick="enableUser('${user.id}')">Habilitar</button>`
+                            }
                         </td>
                     `;
                     userTableBody.appendChild(row);
@@ -102,7 +105,10 @@
                                 <p class="card-text">${user.email}</p>
                                 <button class="btn btn-primary btn-sm">Editar</button>
                                 <button class="btn btn-danger btn-sm">Eliminar</button>
-                                <button class="btn btn-warning btn-sm" onclick="disableUser('${user.id}')">Deshabilitar</button>
+                                ${user.enabled ? 
+                                    `<button class="btn btn-warning btn-sm" onclick="disableUser('${user.id}')">Deshabilitar</button>` :
+                                    `<button class="btn btn-success btn-sm" onclick="enableUser('${user.id}')">Habilitar</button>`
+                                }
                             </div>
                         </div>
                     `;
@@ -182,6 +188,33 @@
             })
             .catch(error => console.error('Error al deshabilitar el usuario:', error));
     }
+    // Función para habilitar un usuario
+    function enableUser(userId) {
+        if (!confirm('¿Estás seguro de que deseas habilitar este usuario?')) {
+            return;
+        }
+
+        fetch('../php/CRUD/usuarios/habilitarUsuario.php', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Usuario habilitado correctamente');
+                    loadUsers();
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            })
+            .catch(error => console.error('Error al habilitar el usuario:', error));
+    }
+
     // Asociar la función al evento de envío del formulario
     document.getElementById('addUserForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Evitar el envío predeterminado del formulario
