@@ -95,3 +95,7 @@ document.getElementById("tarjetas-link").addEventListener("click", function (eve
     event.preventDefault();
     loadContent("../php/panelAdministracion/panelTarjetas.php", this); // Ruta al HTML de Tarjetas
 });
+document.getElementById("perfil-link").addEventListener("click", function (event) {
+    event.preventDefault();
+    loadContent("../php/panelAdministracion/panelPerfilUsuario.php", this); // Ruta al HTML de Perfil usuario
+});

@@ -17,7 +17,7 @@ if (!isset($_SESSION['access_token'])) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración</title>
+    <title>Panel de MKDEH</title>
     <!-- Bootstrap y LineIcons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -30,7 +30,7 @@ if (!isset($_SESSION['access_token'])) {
         <!-- Sidebar -->
         <div id="sidebar" class="bg-dark text-white p-3 d-flex flex-column justify-content-between">
             <div>
-                <h3 class="mb-4">Panel Admin</h3>
+                <h3 class="mb-4">Panel MKDEH</h3>
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a href="#" class="nav-link text-white" id="dashboard-link"><i class="bi bi-speedometer"></i>

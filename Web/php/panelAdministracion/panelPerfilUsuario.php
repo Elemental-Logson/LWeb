@@ -1,54 +1,59 @@
-<div class="d-flex" style="height: 100vh;">
-    <!-- Sidebar -->
-    <div class="bg-dark text-white p-3" style="width: 250px;">
-        <h3>Panel de Usuario</h3>
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link text-white" href="#">Inicio</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="#">Perfil</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="#">Cerrar sesión</a>
-            </li>
-        </ul>
-    </div>
+<?php
+session_start();
 
-    <!-- Main content -->
+if (!isset($_SESSION['username'])) {
+    echo 'Error: Usuario no autenticado.';
+    exit();
+}
+
+// Recuperar los datos de la sesión
+$username = $_SESSION['username'] ?? '';
+$email = $_SESSION['email'] ?? '';
+$firstName = $_SESSION['given_name'] ?? '';
+$lastName = $_SESSION['family_name'] ?? '';
+$auth_time = $_SESSION['auth_time'] ?? '';
+?>
+<div class="d-flex" style="height: 100vh;">
     <div class="flex-grow-1 p-4">
-        <!-- Perfil de Usuario -->
         <h2>Perfil de Usuario</h2>
-        <form>
+        <form id="userProfileForm" action="updateProfile.php" method="POST">
             <div class="row mb-3">
                 <label for="name" class="col-sm-2 col-form-label">Nombre</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="name" value="Juan Pérez" readonly>
+                    <input type="text" class="form-control" id="name" name="name" value="<?= $firstName ?>" readonly>
                 </div>
             </div>
             <div class="row mb-3">
                 <label for="email" class="col-sm-2 col-form-label">Correo Electrónico</label>
                 <div class="col-sm-10">
-                    <input type="email" class="form-control" id="email" value="juan.perez@example.com" readonly>
+                    <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($email) ?>" readonly>
                 </div>
             </div>
             <div class="row mb-3">
-                <label for="phone" class="col-sm-2 col-form-label">Teléfono</label>
+                <label for="lastName" class="col-sm-2 col-form-label">Apellido</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="phone" value="123-456-7890" readonly>
+                    <input type="text" class="form-control" id="lastName" name="lastName" value="<?= htmlspecialchars($lastName) ?>" readonly>
                 </div>
             </div>
             <div class="row mb-3">
-                <label for="address" class="col-sm-2 col-form-label">Dirección</label>
+                <label for="lastName" class="col-sm-2 col-form-label">Ultimo inicio de sesión</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="address" value="Calle Ficticia 123, Ciudad, País" readonly>
+                    <input type="text" class="form-control" id="auth_time" name="auth_time" value="<?= htmlspecialchars($auth_time) ?>" readonly>
                 </div>
             </div>
-
-            <!-- Botón de editar perfil -->
             <button type="button" class="btn btn-primary" id="editButton">Editar</button>
-            <!-- Botón para guardar cambios (aparece al editar) -->
             <button type="submit" class="btn btn-success d-none" id="saveButton">Guardar</button>
         </form>
     </div>
 </div>
+<script>
+    const editButton = document.getElementById('editButton');
+    const saveButton = document.getElementById('saveButton');
+    const formFields = document.querySelectorAll('#userProfileForm input');
+
+    editButton.addEventListener('click', () => {
+        formFields.forEach(field => field.removeAttribute('readonly'));
+        saveButton.classList.remove('d-none');
+        editButton.classList.add('d-none');
+    });
+</script>

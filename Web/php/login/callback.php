@@ -29,6 +29,10 @@ if (isset($_GET['code'])) {
     // Convertir la respuesta a JSON
     $response_data = json_decode($response, true);
 
+    // Mostrar la respuesta completa para depuración
+    // echo "<h3>Respuesta del Token:</h3>";
+    // echo "<pre>" . print_r($response_data, true) . "</pre>";
+
     // Verificar si se obtuvo un token
     if (isset($response_data['access_token'])) {
         $_SESSION['access_token'] = $response_data['access_token'];
@@ -44,9 +48,34 @@ if (isset($_GET['code'])) {
         $decoded_header = json_decode(base64_decode($header), true);
         $decoded_payload = json_decode(base64_decode($payload), true);
 
+        // Mostrar las partes del token para depuración
+        // echo "<h3>Header del Token JWT:</h3>";
+        // echo "<pre>" . print_r($decoded_header, true) . "</pre>";
+
+        // echo "<h3>Payload del Token JWT:</h3>";
+        // echo "<pre>" . print_r($decoded_payload, true) . "</pre>";
+
         // Obtener nombre de usuario y grupos
         $username = isset($decoded_payload['preferred_username']) ? $decoded_payload['preferred_username'] : 'No disponible';
         $roles = isset($decoded_payload['realm_access']['roles']) ? $decoded_payload['realm_access']['roles'] : [];
+        $givenName = isset($decoded_payload['given_name']) ? $decoded_payload['given_name'] : 'No disponible'; //Nombre
+        $familyName = isset($decoded_payload['family_name']) ? $decoded_payload['family_name'] : 'No disponible'; //Apellido
+        $email = isset($decoded_payload['email']) ? $decoded_payload['email'] : 'No disponible'; //Apellido
+        $auth_time = isset($decoded_payload['auth_time']) ? $decoded_payload['auth_time'] : null;
+
+        if ($auth_time !== null) {
+            // Crear un objeto DateTime con la zona horaria de Europa/Madrid
+            $fecha = new DateTime('@' . $auth_time);
+            $fecha->setTimezone(new DateTimeZone('Europe/Madrid'));
+
+            // Formatear la fecha y hora en un formato legible y almacenarla en una variable
+            $inicioSesionHora = $fecha->format('Y-m-d H:i:s'); // Ejemplo de salida: 2024-12-08 16:10:47
+
+            // Mostrar la hora de inicio de sesión
+            echo "Hora de inicio de sesión: " . $inicioSesionHora;
+        } else {
+            echo 'auth_time no disponible';
+        }
 
         // Determinar el rol
         $role = 'Empresa'; // Rol por defecto
@@ -57,18 +86,26 @@ if (isset($_GET['code'])) {
         // Guardamos el nombre de usuario y su rol en la sesión
         $_SESSION["username"] = $username;
         $_SESSION["role"] = $role;
+        $_SESSION["email"] = $email;
+        $_SESSION["given_name"] = $givenName;
+        $_SESSION["family_name"] = $familyName;
+        $_SESSION["auth_time"] = $inicioSesionHora;
 
-        // Mostrar la información
-        // echo "Nombre de usuario: " . $username . "<br>";
+        // Mostrar información del usuario
+        // echo "<h3>Información del Usuario:</h3>";
+        // echo "Nombre de usuario: " . htmlspecialchars($username) . "<br>";
         // echo "Roles: " . implode(", ", $roles) . "<br>";
-        // echo "Rol asignado: " . $role . "<br>";
+        // echo "Rol asignado: " . htmlspecialchars($role) . "<br>";
 
         // Redirigir a la página de login
         header('Location: ../dashboard.php');
         exit;
     } else {
-        echo 'Error al obtener el token.';
+        echo '<h3>Error:</h3>';
+        echo 'Error al obtener el token.<br>';
+        echo '<pre>' . htmlspecialchars($response) . '</pre>';
     }
 } else {
+    echo '<h3>Error:</h3>';
     echo 'No se recibió el código de autenticación.';
 }
