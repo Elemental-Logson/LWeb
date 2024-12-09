@@ -2,8 +2,13 @@
 session_start(); // Iniciar la sesión
 
 // Comprobar si hay un token de autenticación en la sesión
-require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/comprobarNormal.php');
-
+if (!isset($_SESSION['access_token'])) {
+    // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login
+    session_unset();  // Elimina todas las variables de sesión
+    session_destroy(); // Destruye la sesión
+    header('Location: /lweb/Web/php/login/loginUnificado.php'); // Redirige al login
+    exit;
+}
 // Verificar el rol del usuario
 $role = $_SESSION['role'] ?? '';
 $username = htmlspecialchars($_SESSION['username'] ?? 'Usuario');

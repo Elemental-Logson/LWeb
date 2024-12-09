@@ -2,12 +2,14 @@
 session_start(); // Inicia la sesión
 
 // Verificar si la sesión está activa
-if (!isset($_SESSION['username'])) {
-    die(json_encode(["error" => "Acceso denegado: No has iniciado sesión."]));
-}
-
 include('../../../www/conexion.php'); // Conexión a la base de datos
-
+if (!isset($_SESSION['access_token']) || (!isset($_SESSION["role"]) != "Admin")) {
+    // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login
+    session_unset();  // Elimina todas las variables de sesión
+    session_destroy(); // Destruye la sesión
+    header('Location: /lweb/Web/php/login/loginUnificado.php'); // Redirige al login
+    exit;
+}
 // Verificar si el método es DELETE
 if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
     // Obtener el cuerpo de la solicitud y decodificarlo como JSON

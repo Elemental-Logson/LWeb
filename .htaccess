@@ -10,3 +10,4 @@
 
 # Redirigir errores 404 a la página personalizada
 ErrorDocument 404 /LWeb/Web/html/404.html
+

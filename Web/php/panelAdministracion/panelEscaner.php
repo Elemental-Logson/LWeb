@@ -84,8 +84,6 @@
 <script>
     loadScan();
 
-
-
     document.querySelector('.btn-primary.w-100').addEventListener('click', function() {
         const targetRange = document.getElementById('targetRange').value;
         const scanName = document.getElementById('scanName').value;

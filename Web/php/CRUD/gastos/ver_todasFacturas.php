@@ -2,10 +2,15 @@
 session_start(); // Inicia la sesión
 
 // Verificar si la sesión está activa
-require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/comprobarNormal.php');
-
 include('../../../www/conexion.php'); // Conexión a la base de datos
-
+// Comprobar si hay un token de autenticación en la sesión
+if (!isset($_SESSION['access_token'])) {
+    // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login
+    session_unset();  // Elimina todas las variables de sesión
+    session_destroy(); // Destruye la sesión
+    header('Location: /lweb/Web/php/login/loginUnificado.php'); // Redirige al login
+    exit;
+}
 try {
     // Obtener las transacciones del usuario
     $sql = "SELECT descripcion, monto, fecha, factura FROM gastos";
