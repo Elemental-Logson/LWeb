@@ -2,9 +2,7 @@
 session_start(); // Inicia la sesión
 
 // Verificar si la sesión está activa
-// if (!isset($_SESSION['username'])) {
-//     die(json_encode(["error" => "Acceso denegado: No has iniciado sesión."]));
-// }
+require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/comprobarNormal.php');
 
 include('../../../www/conexion.php'); // Conexión a la base de datos
 

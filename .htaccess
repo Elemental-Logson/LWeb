@@ -5,7 +5,7 @@
 </Files>
 
 # Establecer el archivo predeterminado como loginUnificado.php
-DirectoryIndex loginUnificado.php
+  DirectoryIndex loginUnificado.php
 # Options -Indexes
 
 # Redirigir errores 404 a la página personalizada

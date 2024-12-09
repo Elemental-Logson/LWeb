@@ -12,6 +12,7 @@ $email = $_SESSION['email'] ?? '';
 $firstName = $_SESSION['given_name'] ?? '';
 $lastName = $_SESSION['family_name'] ?? '';
 $auth_time = $_SESSION['auth_time'] ?? '';
+$role = $_SESSION['role'] ?? 'No asignado'; // Rol asignado o valor predeterminado
 ?>
 <div class="container-fluid d-flex justify-content-center align-items-center vh-100">
     <div class="card shadow" style="max-width: 800px; width: 100%;">
@@ -23,7 +24,7 @@ $auth_time = $_SESSION['auth_time'] ?? '';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="name" name="name" value="<?= $firstName ?>" readonly>
+                                <input type="text" class="form-control" id="name" name="name" value="<?= htmlspecialchars($firstName) ?>" readonly>
                                 <label for="name">Nombre</label>
                             </div>
                         </div>
@@ -41,6 +42,10 @@ $auth_time = $_SESSION['auth_time'] ?? '';
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="auth_time" name="auth_time" value="<?= htmlspecialchars($auth_time) ?>" readonly>
                         <label for="auth_time">Último inicio de sesión</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="role" name="role" value="<?= htmlspecialchars($role) ?>" readonly>
+                        <label for="role">Rol</label>
                     </div>
                 </form>
             </div>

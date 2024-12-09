@@ -1,9 +1,8 @@
 <?php
 session_start(); // Inicia la sesión
+
 // Verificar si la sesión está activa
-if (!isset($_SESSION['username'])) {
-    die("Acceso denegado: No has iniciado sesión.");
-}
+require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/comprobarNormal.php');
 include('../../../www/conexion.php');
 
 
