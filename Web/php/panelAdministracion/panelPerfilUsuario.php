@@ -13,47 +13,42 @@ $firstName = $_SESSION['given_name'] ?? '';
 $lastName = $_SESSION['family_name'] ?? '';
 $auth_time = $_SESSION['auth_time'] ?? '';
 ?>
-<div class="d-flex" style="height: 100vh;">
-    <div class="flex-grow-1 p-4">
-        <h2>Perfil de Usuario</h2>
-        <form id="userProfileForm" action="updateProfile.php" method="POST">
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label">Nombre</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="name" name="name" value="<?= $firstName ?>" readonly>
-                </div>
+<div class="container-fluid d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow" style="max-width: 800px; width: 100%;">
+        <div class="row g-0">
+            <!-- Columna para la información del usuario -->
+            <div class="col-md-8 p-4">
+                <h2 class="card-title">Perfil de Usuario</h2>
+                <form id="userProfileForm" action="updateProfile.php" method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="name" name="name" value="<?= $firstName ?>" readonly>
+                                <label for="name">Nombre</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="lastName" name="lastName" value="<?= htmlspecialchars($lastName) ?>" readonly>
+                                <label for="lastName">Apellido</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($email) ?>" readonly>
+                        <label for="email">Correo Electrónico</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="auth_time" name="auth_time" value="<?= htmlspecialchars($auth_time) ?>" readonly>
+                        <label for="auth_time">Último inicio de sesión</label>
+                    </div>
+                </form>
             </div>
-            <div class="row mb-3">
-                <label for="email" class="col-sm-2 col-form-label">Correo Electrónico</label>
-                <div class="col-sm-10">
-                    <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($email) ?>" readonly>
-                </div>
+
+            <!-- Columna para el bloque gris -->
+            <div class="col-md-4 d-flex align-items-center justify-content-center p-4">
+                <div class="bg-secondary rounded-circle" style="width: 150px; height: 150px;"></div>
             </div>
-            <div class="row mb-3">
-                <label for="lastName" class="col-sm-2 col-form-label">Apellido</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="lastName" name="lastName" value="<?= htmlspecialchars($lastName) ?>" readonly>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="lastName" class="col-sm-2 col-form-label">Ultimo inicio de sesión</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="auth_time" name="auth_time" value="<?= htmlspecialchars($auth_time) ?>" readonly>
-                </div>
-            </div>
-            <button type="button" class="btn btn-primary" id="editButton">Editar</button>
-            <button type="submit" class="btn btn-success d-none" id="saveButton">Guardar</button>
-        </form>
+        </div>
     </div>
 </div>
-<script>
-    const editButton = document.getElementById('editButton');
-    const saveButton = document.getElementById('saveButton');
-    const formFields = document.querySelectorAll('#userProfileForm input');
-
-    editButton.addEventListener('click', () => {
-        formFields.forEach(field => field.removeAttribute('readonly'));
-        saveButton.classList.remove('d-none');
-        editButton.classList.add('d-none');
-    });
-</script>
