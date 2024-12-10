@@ -79,12 +79,12 @@ if (!defined('ACCESO_PERMITIDO')) {
     </div>
 
     <!-- Contenedor para los detalles del escaneo -->
-    <div id="scanDetailsContainer" class="container mt-4 hidden">
+    <div id="scanDetailsContainer" class="container mt-4 ">
         <!-- Aquí se mostrarán los detalles del escaneo seleccionado -->
     </div>
 
     <!-- Contenedor para las vulnerabilidades -->
-    <div id="vulnerabilitiesContainer" class="container mt-4 hidden">
+    <div id="vulnerabilitiesContainer" class="container mt-4 ">
         <!-- Aquí se mostrarán las vulnerabilidades de la IP seleccionada -->
     </div>
 </div>

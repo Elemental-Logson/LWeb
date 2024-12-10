@@ -1,6 +1,11 @@
 <?php
+session_start(); // Inicia la sesión
 
 // Verificar si la sesión está activa
+if (!isset($_SESSION['username'])) {
+    die(json_encode(["error" => "Acceso denegado: No has iniciado sesión."]));
+}
+
 include('../../../www/conexion.php'); // Conexión a la base de datos
 
 if (!isset($_GET['scanned_ip_id'])) {
