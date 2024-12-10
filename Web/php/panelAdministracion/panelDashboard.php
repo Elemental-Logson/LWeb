@@ -1,3 +1,11 @@
+<?php
+if (!defined('ACCESO_PERMITIDO')) {
+    // header('HTTP/1.0 403 Forbidden');
+    // exit('No tienes permiso para acceder directamente a este archivo.');
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
+?>
 <style>
     /* Contenedor de Slider */
     .range-container {

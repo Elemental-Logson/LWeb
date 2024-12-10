@@ -1,5 +1,10 @@
 <?php
-session_start();
+if (!defined('ACCESO_PERMITIDO')) {
+    // header('HTTP/1.0 403 Forbidden');
+    // exit('No tienes permiso para acceder directamente a este archivo.');
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 
 if (!isset($_SESSION['username'])) {
     echo 'Error: Usuario no autenticado.';

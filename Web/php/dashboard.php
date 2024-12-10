@@ -1,6 +1,5 @@
 <?php
 session_start(); // Iniciar la sesión
-
 // Comprobar si hay un token de autenticación en la sesión
 if (!isset($_SESSION['access_token'])) {
     // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login

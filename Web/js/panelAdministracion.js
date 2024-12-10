@@ -74,28 +74,32 @@ function setActiveLink(activeLink) {
 // Añadir listeners a cada enlace del sidebar
 document.getElementById("dashboard-link").addEventListener("click", function (event) {
     event.preventDefault();
-    loadContent("../php/panelAdministracion/panelDashboard.php", this); // Ruta al HTML de Dashboard
+    // Ahora en vez de ../php/panelAdministracion/panelDashboard.php
+    // usamos cargaParcial.php con el parámetro view=dashboard
+    loadContent("cargaParcial.php?view=dashboard", this);
 });
 
 document.getElementById("usuarios-link").addEventListener("click", function (event) {
     event.preventDefault();
-    loadContent("../php/panelAdministracion/panelUsuarios.php", this); // Ruta al HTML de Usuarios
+    loadContent("cargaParcial.php?view=usuarios", this);
 });
 
 document.getElementById("escaner-link").addEventListener("click", function (event) {
     event.preventDefault();
-    loadContent("../php/panelAdministracion/panelEscaner.php", this); // Ruta al HTML de Escaner
+    loadContent("cargaParcial.php?view=escaner", this);
 });
 
 document.getElementById("transacciones-link").addEventListener("click", function (event) {
     event.preventDefault();
-    loadContent("../php/panelAdministracion/panelTransacciones.php", this); // Ruta al HTML de Transacciones
+    loadContent("cargaParcial.php?view=transacciones", this);
 });
+
 document.getElementById("tarjetas-link").addEventListener("click", function (event) {
     event.preventDefault();
-    loadContent("../php/panelAdministracion/panelTarjetas.php", this); // Ruta al HTML de Tarjetas
+    loadContent("cargaParcial.php?view=tarjetas", this);
 });
+
 document.getElementById("perfil-link").addEventListener("click", function (event) {
     event.preventDefault();
-    loadContent("../php/panelAdministracion/panelPerfilUsuario.php", this); // Ruta al HTML de Perfil usuario
+    loadContent("cargaParcial.php?view=perfil", this);
 });

@@ -1,13 +1,6 @@
 <?php
 // Configuración de Keycloak
 require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/config.php');
-if (!isset($_SESSION['access_token']) || (!isset($_SESSION["role"]) != "Admin")) {
-    // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login
-    session_unset();  // Elimina todas las variables de sesión
-    session_destroy(); // Destruye la sesión
-    header('Location: /lweb/Web/php/login/loginUnificado.php'); // Redirige al login
-    exit;
-}
 // Función para obtener el token de acceso
 function obtenerTokenDeAcceso($token_url, $client_id, $client_secret)
 {

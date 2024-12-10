@@ -1,23 +1,21 @@
 <?php
-session_start(); // Inicia la sesión
-
+session_start();
 // Verificar si la sesión está activa
 include('../../../www/conexion.php'); // Conexión a la base de datos
-// Comprobar si hay un token de autenticación en la sesión
-if (!isset($_SESSION['access_token'])) {
-    // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login
-    session_unset();  // Elimina todas las variables de sesión
-    session_destroy(); // Destruye la sesión
-    header('Location: /lweb/Web/php/login/loginUnificado.php'); // Redirige al login
-    exit;
-}
+
 $nombre_usuario = $_SESSION['username'];
 
 try {
     // Obtener las transacciones del usuario
-    $sql = "SELECT descripcion, monto, fecha, factura FROM gastos WHERE nombre_usuario = :nombre_usuario";
+    if ($_SESSION["role"] === "Admin") {
+        $sql = "SELECT descripcion, monto, fecha, factura FROM gastos";
+    } else {
+        $sql = "SELECT descripcion, monto, fecha, factura FROM gastos WHERE nombre_usuario = :nombre_usuario";
+    }
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':nombre_usuario', $nombre_usuario);
+    if ($_SESSION["role"] != "Admin") {
+        $stmt->bindParam(':nombre_usuario', $nombre_usuario);
+    }
     $stmt->execute();
 
     $transacciones = $stmt->fetchAll(PDO::FETCH_ASSOC);

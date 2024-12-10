@@ -1,3 +1,11 @@
+<?php
+if (!defined('ACCESO_PERMITIDO')) {
+    // header('HTTP/1.0 403 Forbidden');
+    // exit('No tienes permiso para acceder directamente a este archivo.');
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
+?>
 <div class="container mt-5">
     <h1>Gestión de Usuarios</h1>
     <!-- Contenedor para la tabla de usuarios -->
