@@ -1,11 +1,10 @@
 <?php
 session_start();
 // Aquí puedes verificar si el usuario está logueado
-// if(!isset($_SESSION['usuario_logueado'])) {
-//     header("HTTP/1.0 401 Unauthorized");
-//     exit("No autorizado");
-// }
-
+if (!isset($_SESSION['access_token'])) {
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 define('ACCESO_PERMITIDO', true);
 
 $view = $_GET['view'] ?? '';
@@ -31,9 +30,8 @@ switch ($view) {
         $filePath = __DIR__ . '/panelAdministracion/panelPerfilUsuario.php';
         break;
     default:
-        header("HTTP/1.0 404 Not Found");
-        echo "Contenido no encontrado.";
-        exit;
+    header("Location: /LWeb/Web/html/404.html");
+    exit();
 }
 
 // Mostrar la ruta en la consola del navegador
