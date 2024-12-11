@@ -90,6 +90,15 @@ $username = htmlspecialchars($_SESSION['username'] ?? 'Usuario');
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="../js/panelAdministracion.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simular un clic en el enlace del Dashboard
+            const dashboardLink = document.getElementById('dashboard-link');
+            if (dashboardLink) {
+                dashboardLink.click();
+            }
+        });
+    </script>
 </body>
 
 </html>

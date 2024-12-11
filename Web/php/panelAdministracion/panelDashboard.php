@@ -104,9 +104,11 @@ if (!defined('ACCESO_PERMITIDO')) {
         <h1>Gestión de Gastos</h1>
         <div class="btn-group mt-3 mt-md-0">
             <button id="apply-filters" class="btn btn-primary"><i class="bi bi-search"></i></button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#chartModal"><i class="bi bi-bar-chart-fill"></i></button>
             <button id="clear-filters" class="btn btn-danger"><i class="bi bi-x-circle"></i></button>
         </div>
     </div>
+
     <div class="row mb-4">
         <div class="col-6">
             <div class="card">
@@ -125,11 +127,17 @@ if (!defined('ACCESO_PERMITIDO')) {
             </div>
         </div>
     </div>
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <canvas id="expenses-chart" class="w-100 h-auto" style="min-height: 300px;"></canvas>
+
+    <!-- Modal -->
+    <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chartModalLabel">Gráfico de Gastos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <canvas id="expenses-chart-modal" class="w-100 h-auto" style="min-height: 300px;"></canvas>
                 </div>
             </div>
         </div>
@@ -202,13 +210,13 @@ if (!defined('ACCESO_PERMITIDO')) {
     // fetchExpenses();
     // Llamar a calculateTotals al cargar datos iniciales
     fetchExpenses().then(() => {
-        calculateTotals(expenses); // Usar todos los datos al inicio
+        calculateTotals(expenses, expenses); // Usar todos los datos al inicio
         renderChart(filteredExpenses);
     });
 
     var expenses = [];
     var filteredExpenses = [];
-    var rowsPerPage = 10;
+    var rowsPerPage = 5;
     var currentPage = 1;
 
     // Obtener elementos del DOM
@@ -310,7 +318,7 @@ if (!defined('ACCESO_PERMITIDO')) {
         renderPagination();
 
         // Actualizar totales y gráfico
-        calculateTotals(filteredExpenses);
+        calculateTotals(expenses, filteredExpenses);
         renderChart(filteredExpenses);
     });
 
@@ -382,7 +390,7 @@ if (!defined('ACCESO_PERMITIDO')) {
         const groupedData = groupExpensesByDate(data); // Agrupar por día
         const chartData = prepareChartData(groupedData); // Preparar datos del gráfico
 
-        const ctx = document.getElementById('expenses-chart').getContext('2d');
+        const ctx = document.getElementById('expenses-chart-modal').getContext('2d');
 
         // Si el gráfico ya existe, destrúyelo para actualizarlo
         if (expensesChart) {
@@ -404,8 +412,8 @@ if (!defined('ACCESO_PERMITIDO')) {
                         callbacks: {
                             label: function(tooltipItem) {
                                 return `€ ${tooltipItem.raw.toLocaleString('es-ES', {
-                            minimumFractionDigits: 2
-                        })}`;
+                                minimumFractionDigits: 2
+                            })}`;
                             }
                         }
                     }
@@ -435,14 +443,15 @@ if (!defined('ACCESO_PERMITIDO')) {
         renderChart(filteredExpenses); // Usar datos iniciales al cargar la página
     });
 
-    function calculateTotals(data) {
-        // Calcular el total de todos los gastos
-        const total = data.reduce((sum, expense) => sum + parseFloat(expense.monto), 0);
+    function calculateTotals(allData, filteredData) {
+        // Calcular el total de todos los gastos (sin filtrar)
+        const total = allData.reduce((sum, expense) => sum + parseFloat(expense.monto), 0);
 
         // Calcular el total de los gastos del mes actual
         const currentMonth = new Date().getMonth(); // Mes actual (0-11)
         const currentYear = new Date().getFullYear(); // Año actual
-        const monthlyTotal = data
+
+        const monthlyTotal = allData
             .filter(expense => {
                 const expenseDate = new Date(expense.fecha);
                 return (
@@ -456,10 +465,12 @@ if (!defined('ACCESO_PERMITIDO')) {
         document.getElementById('total-expenses').innerText = total.toLocaleString('es-ES', {
             minimumFractionDigits: 2
         });
+
         document.getElementById('monthly-expenses').innerText = monthlyTotal.toLocaleString('es-ES', {
             minimumFractionDigits: 2
         });
     }
+
 
     function groupExpensesByDate(data) {
         // Ordenar por fecha ascendente
@@ -512,5 +523,8 @@ if (!defined('ACCESO_PERMITIDO')) {
             datasets
         };
     }
+    document.getElementById('chartModal').addEventListener('shown.bs.modal', () => {
+        renderChart(filteredExpenses); // Renderiza el gráfico con los datos filtrados
+    });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
