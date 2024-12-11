@@ -1,11 +1,11 @@
 <?php
 // Configuración de Keycloak
 // $realm = 'SSO';  // Nombre del realm
-$realm = 'Master';  // Nombre del realm
+$realm = 'master';  // Nombre del realm
 $client_id = 'SSO';  // ID del cliente registrado en Keycloak
 $client_secret = '0OUwDjXfU7eAdBHF9b89I6rRbxV6xrwv';  // Secreto del cliente
-$redirect_uri = 'https://localhost/lweb/Web/php/login/callback.php';  // URL de callback
-$redirect_uriLogOut = 'https://localhost/lweb/Web/php/login/loginUnificado.php'; // URL del logout
+$redirect_uri = 'http://10.11.0.17/LWeb/Web/php/login/callback.php';  // URL de callback
+$redirect_uriLogOut = 'http://10.11.0.17/LWeb/Web/php/login/loginUnificado.php'; // URL del logout
 
 // Dirección IP de Keycloak
 $ip = '10.11.0.18:8443'; // Dirección IP y puerto del servidor Keycloak

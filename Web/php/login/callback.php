@@ -27,7 +27,8 @@ if (isset($_GET['code'])) {
     // TEMPORALMENTE (no usar en producción si el certificado no es válido)
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-
+    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
     // Opcional: activar el modo verbose para depurar
     // curl_setopt($ch, CURLOPT_VERBOSE, true);
     

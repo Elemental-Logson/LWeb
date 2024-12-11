@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $username;
 
             // Redirección con Meta Refresh
-            echo '<meta http-equiv="refresh" content="0;url=/lweb/Web/php/dashboard.php">';
+            echo '<meta http-equiv="refresh" content="0;url=/LWeb/Web/php/dashboard.php">';
             exit;
         } else {
             echo 'Usuario o contraseña incorrectos.';
