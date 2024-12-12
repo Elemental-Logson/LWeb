@@ -74,8 +74,6 @@ function setActiveLink(activeLink) {
 // Añadir listeners a cada enlace del sidebar
 document.getElementById("dashboard-link").addEventListener("click", function (event) {
     event.preventDefault();
-    // Ahora en vez de ../php/panelAdministracion/panelDashboard.php
-    // usamos cargaParcial.php con el parámetro view=dashboard
     loadContent("cargaParcial.php?view=dashboard", this);
 });
 

@@ -8,9 +8,9 @@ $nombre_usuario = $_SESSION['username'];
 try {
     // Obtener las transacciones del usuario
     if ($_SESSION["role"] === "Admin") {
-        $sql = "SELECT descripcion, monto, fecha, factura FROM gastos";
+        $sql = "SELECT descripcion, monto, fecha, factura, nombre_usuario FROM gastos";
     } else {
-        $sql = "SELECT descripcion, monto, fecha, factura FROM gastos WHERE nombre_usuario = :nombre_usuario";
+        $sql = "SELECT descripcion, monto, fecha, factura, nombre_usuario FROM gastos WHERE nombre_usuario = :nombre_usuario";
     }
     $stmt = $conn->prepare($sql);
     if ($_SESSION["role"] != "Admin") {

@@ -5,6 +5,8 @@ if (!defined('ACCESO_PERMITIDO')) {
     header("Location: /LWeb/Web/html/forbidden.html");
     exit();
 }
+$username = htmlspecialchars($_SESSION['username'] ?? 'Usuario');
+$role = $_SESSION['role'];
 ?>
 <!-- Botón para abrir el modal -->
 <button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#expenseModal">
@@ -70,6 +72,8 @@ if (!defined('ACCESO_PERMITIDO')) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    var username = "<?php echo $username; ?>";
+    var role = "<?php echo $role; ?>";
     loadExpenses();
 
     function loadExpenses() {
@@ -80,15 +84,26 @@ if (!defined('ACCESO_PERMITIDO')) {
                 expenseTableBody.innerHTML = '';
 
                 data.forEach(transaction => {
+                    // Generar la ruta dependiendo del rol
+                    const facturaRuta = transaction.factura ?
+                        (role === 'Admin' ?
+                            `../../img/${transaction.nombre_usuario}/${transaction.factura}` // Admin accede a cualquier carpeta
+                            :
+                            `../../img/${username}/${transaction.factura}`) // Usuario accede solo a su carpeta
+                        :
+                        null;
+
                     const row = document.createElement('tr');
                     row.innerHTML = `
-            <td>${transaction.descripcion}</td>
-            <td>${transaction.monto}</td>
-            <td>${new Date(transaction.fecha).toLocaleDateString()}</td>
-            <td>
-              <a href="../../img/${transaction.factura}" target="_blank">Ver Factura</a>
-            </td>
-          `;
+                    <td>${transaction.descripcion}</td>
+                    <td>${transaction.monto}</td>
+                    <td>${new Date(transaction.fecha).toLocaleDateString()}</td>
+                    <td>
+                      ${facturaRuta 
+                        ? `<a href="${facturaRuta}" target="_blank">Ver Factura</a>` 
+                        : 'Sin ticket'}
+                    </td>
+                `;
                     expenseTableBody.appendChild(row);
                 });
             })

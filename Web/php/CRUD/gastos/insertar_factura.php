@@ -14,18 +14,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validar archivo de factura
     if ($factura && $factura['error'] === UPLOAD_ERR_OK) {
-        $directorio_destino = $_SERVER['DOCUMENT_ROOT'] . '/LWeb/img/';
+        // Directorio base para las facturas
+        $base_directorio = $_SERVER['DOCUMENT_ROOT'] . '/LWeb/img/';
+        // Crear un subdirectorio para el usuario
+        $directorio_usuario = $base_directorio . $nombre_usuario . '/';
+
+        // Crear el directorio del usuario si no existe
+        if (!file_exists($directorio_usuario)) {
+            if (!mkdir($directorio_usuario, 0775, true)) {
+                echo "Error al crear el directorio para el usuario.";
+                exit;
+            }
+        }
+
         $extension = strtolower(pathinfo($factura['name'], PATHINFO_EXTENSION));
         $extensiones_permitidas = ['jpg', 'jpeg', 'png', 'gif'];
 
         if (in_array($extension, $extensiones_permitidas)) {
             $nuevo_nombre = uniqid('factura_') . '.' . $extension;
-            $archivo_destino = $directorio_destino . $nuevo_nombre;
-
-            // Crear el directorio si no existe
-            if (!file_exists($directorio_destino)) {
-                mkdir($directorio_destino, 0775, true);
-            }
+            $archivo_destino = $directorio_usuario . $nuevo_nombre;
 
             // Mover el archivo subido
             if (move_uploaded_file($factura['tmp_name'], $archivo_destino)) {

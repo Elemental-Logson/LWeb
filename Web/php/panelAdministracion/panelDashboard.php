@@ -5,6 +5,8 @@ if (!defined('ACCESO_PERMITIDO')) {
     header("Location: /LWeb/Web/html/forbidden.html");
     exit();
 }
+$username = htmlspecialchars($_SESSION['username'] ?? 'Usuario');
+$role = $_SESSION['role'];
 ?>
 <style>
     /* Contenedor de Slider */
@@ -341,6 +343,8 @@ if (!defined('ACCESO_PERMITIDO')) {
             console.error('Error al cargar los gastos:', error);
         }
     }
+    var username = "<?php echo $username; ?>";
+    var role = "<?php echo $role; ?>";
 
     function renderTable() {
         const tableBody = document.getElementById('expense-table-body');
@@ -351,12 +355,23 @@ if (!defined('ACCESO_PERMITIDO')) {
         const currentPageData = filteredExpenses.slice(startIndex, endIndex);
 
         currentPageData.forEach(expense => {
+            // Generar la ruta dependiendo del rol
+            const facturaRuta = expense.factura ?
+                (role === 'Admin' ?
+                    `../../img/${expense.nombre_usuario}/${expense.factura}` :
+                    `../../img/${username}/${expense.factura}`) :
+                null;
+
             const row = `
             <tr>
                 <td>${expense.descripcion}</td>
                 <td>${expense.monto}</td>
                 <td>${new Date(expense.fecha).toLocaleDateString()}</td>
-                <td><a href="../../img/${expense.factura}" target="_blank">Ver Factura</a></td>
+                <td>
+                    ${facturaRuta 
+                        ? `<a href="${facturaRuta}" target="_blank">Ver Factura</a>`
+                        : 'Sin ticket'}
+                </td>
             </tr>
         `;
             tableBody.insertAdjacentHTML('beforeend', row);
