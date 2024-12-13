@@ -7,9 +7,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ' . "loginsso.php");
         exit;
     }
-    // Si es un login por otra plataforma, redirige a otro archivo
+    // Si es un login por otra plataforma, redirige a loginsso2.php
     if (isset($_POST['other_platform_login'])) {
-        header('Location: ' . "loginotherplatform.php");
+        header('Location: ' . "loginsso2.php");
         exit;
     }
 }

@@ -16,6 +16,10 @@ function obtenerTokenDeAcceso($token_url, $client_id, $client_secret)
         'Content-Type: application/x-www-form-urlencoded',
     ]);
 
+    // Deshabilitar validación del certificado (no recomendado en producción)
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
     $response = curl_exec($ch);
 
     if (curl_errno($ch)) {
@@ -31,6 +35,7 @@ function obtenerTokenDeAcceso($token_url, $client_id, $client_secret)
     }
 }
 
+
 // Función para obtener la lista de usuarios
 function obtenerUsuarios($users_url, $access_token)
 {
@@ -41,6 +46,10 @@ function obtenerUsuarios($users_url, $access_token)
         'Authorization: Bearer ' . $access_token,
         'Content-Type: application/json',
     ]);
+
+    // Deshabilitar validación del certificado
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
     $response = curl_exec($ch);
     if (curl_errno($ch)) {
@@ -55,6 +64,7 @@ function obtenerUsuarios($users_url, $access_token)
         throw new Exception('No se pudo obtener la lista de usuarios.');
     }
 }
+
 
 try {
     // Obtener el token de acceso

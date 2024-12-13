@@ -26,6 +26,10 @@ $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPGET, true); // Configura como GET
 
+// Desactiva la verificación de SSL (NO RECOMENDADO PARA PRODUCCIÓN)
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
 // Ejecuta la solicitud y captura la respuesta
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
