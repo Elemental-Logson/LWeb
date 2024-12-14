@@ -74,9 +74,7 @@
 /* Estado seleccionado */
 #sidebar .nav-link.active {
     background-color: #007bff;
-    /* Color de selección, por ejemplo, azul */
     border-radius: 5px;
     color: white;
     font-weight: bold;
-    /* Resalta el texto */
 }

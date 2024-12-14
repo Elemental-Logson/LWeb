@@ -9,7 +9,7 @@ if (!defined('ACCESO_PERMITIDO')) {
 <div class="container mt-5">
     <h1>Gestión de Usuarios</h1>
     <!-- Contenedor para la tabla de usuarios -->
-    <div class="table-responsive">
+    <div class="table-responsive d-none d-md-block">
         <table class="table table-striped" id="userTable">
             <thead>
                 <tr>
@@ -26,7 +26,7 @@ if (!defined('ACCESO_PERMITIDO')) {
     </div>
 
     <!-- Contenedor para las tarjetas de usuarios en dispositivos móviles -->
-    <div class="row mt-4" id="userCards">
+    <div class="row mt-4 d-block d-md-none" id="userCards">
         <!-- Tarjetas de usuarios se insertarán aquí -->
     </div>
 </div>
@@ -89,8 +89,6 @@ if (!defined('ACCESO_PERMITIDO')) {
                         <td>${user.nombre}</td>
                         <td>${user.email}</td>
                         <td>
-                            <button class="btn btn-primary btn-sm">Editar</button>
-                            <button class="btn btn-danger btn-sm">Eliminar</button>
                             ${user.enabled ? 
                                 `<button class="btn btn-warning btn-sm" onclick="disableUser('${user.id}')">Deshabilitar</button>` :
                                 `<button class="btn btn-success btn-sm" onclick="enableUser('${user.id}')">Habilitar</button>`
@@ -109,8 +107,6 @@ if (!defined('ACCESO_PERMITIDO')) {
                             <div class="card-body">
                                 <h5 class="card-title">${user.nombre}</h5>
                                 <p class="card-text">${user.email}</p>
-                                <button class="btn btn-primary btn-sm">Editar</button>
-                                <button class="btn btn-danger btn-sm">Eliminar</button>
                                 ${user.enabled ? 
                                     `<button class="btn btn-warning btn-sm" onclick="disableUser('${user.id}')">Deshabilitar</button>` :
                                     `<button class="btn btn-success btn-sm" onclick="enableUser('${user.id}')">Habilitar</button>`
