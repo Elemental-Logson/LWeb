@@ -1,4 +1,11 @@
 <?php
+session_start(); // Iniciar la sesión
+// Verificar si la sesión está activa
+if (!isset($_SESSION['access_token']) || $_SESSION['role'] !== "Admin") {
+    // Redirigir al usuario a la página prohibida
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 // Configuración de Keycloak
 require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/config.php');
 // Función para obtener el token de acceso
@@ -72,7 +79,6 @@ try {
 
     // Obtener la lista de usuarios
     $usuarios = obtenerUsuarios($users_url, $access_token);
-
     // Devolver los usuarios en formato JSON
     header('Content-Type: application/json');
     echo json_encode($usuarios);

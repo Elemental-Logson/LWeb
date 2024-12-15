@@ -30,12 +30,12 @@ switch ($view) {
         $filePath = __DIR__ . '/panelAdministracion/panelPerfilUsuario.php';
         break;
     default:
-    header("Location: /LWeb/Web/html/404.html");
-    exit();
+        header("Location: /LWeb/Web/html/404.html");
+        exit();
 }
 
 // Mostrar la ruta en la consola del navegador
-echo "<script>console.log('Cargando: " . addslashes($filePath) . "');</script>";
+// echo "<script>console.log('Cargando: " . addslashes($filePath) . "');</script>";
 
 // Incluir el archivo
 include $filePath;

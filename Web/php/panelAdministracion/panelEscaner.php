@@ -6,7 +6,7 @@ if (!defined('ACCESO_PERMITIDO')) {
     exit();
 }
 ?>
-<div class="container-fluid mt-5">
+<div class="container my-5">
     <div class="row">
         <div class="col-12 col-md-6">
             <h3 class="text-center text-md-start">Panel de Escáner de Red y Vulnerabilidades</h3>
@@ -111,11 +111,12 @@ if (!defined('ACCESO_PERMITIDO')) {
 
         // Construir el cuerpo de la solicitud
         const requestBody = {
-            targetRange,
-            scanName,
-            portRange,
-            scanIntensity
+            target_ip: targetRange,
+            scan_name: scanName,
+            ports: portRange, 
+            intensity: scanIntensity 
         };
+
 
         // Determinar el endpoint según el tipo de escaneo
         let endpoint = '';
@@ -126,7 +127,8 @@ if (!defined('ACCESO_PERMITIDO')) {
         }
 
         // Realizar la solicitud a la API
-        fetch(`http://10.11.0.147:8000${endpoint}`, {
+        // fetch(`http://10.11.0.147:8000${endpoint}`, {
+        fetch(`http://192.168.18.4:8001${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -212,8 +214,8 @@ if (!defined('ACCESO_PERMITIDO')) {
                         ${ip.state}
                     </td>
                     <td>
-                        <a href="#" class="btn btn-primary btn-sm" onclick="viewVulnerabilities(${ip.id})">Ver Vulnerabilidades</a>
-                        <a href="#" class="btn btn-danger btn-sm ms-2" onclick="deleteScannedIp(${ip.id})">Eliminar</a>
+                        <a href="#"   onclick="viewVulnerabilities(${ip.id})">Ver Vulnerabilidades</a>
+                        <a href="#"   onclick="deleteScannedIp(${ip.id})">Eliminar</a>
                     </td>
                 </tr>
                 `;

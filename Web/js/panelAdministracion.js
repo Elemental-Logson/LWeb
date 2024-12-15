@@ -28,7 +28,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
 // Función para cargar contenido HTML y JS externo en main-content
 function loadContent(url, element) {
     fetch(url)

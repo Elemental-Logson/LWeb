@@ -1,5 +1,10 @@
 <?php
 session_start();
+if (!isset($_SESSION['access_token'])) {
+    // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 // Verificar si la sesión está activa
 include('../../../www/conexion.php');
 

@@ -209,25 +209,32 @@ $role = $_SESSION['role'];
 </div>
 
 <script>
-    // fetchExpenses();
+    var expenses = [];
+    var filteredExpenses = [];
+    var rowsPerPage = window.innerWidth <= 768 ? 5 : 10;
+    var currentPage = 1;
+    var priceMinSlider = document.getElementById('filter-price-range');
+    var priceMaxSlider = document.getElementById('filter-price-range-max');
+    var priceMinInput = document.getElementById('price-min-input');
+    var priceMaxInput = document.getElementById('price-max-input');
+    var expensesChart;
+    var username = "<?php echo $username; ?>";
+    var role = "<?php echo $role; ?>";
     // Llamar a calculateTotals al cargar datos iniciales
     fetchExpenses().then(() => {
         calculateTotals(expenses, expenses); // Usar todos los datos al inicio
         renderChart(filteredExpenses);
     });
+    window.addEventListener('resize', updateRowsPerPage);
 
-    var expenses = [];
-    var filteredExpenses = [];
-    var rowsPerPage = 5;
-    var currentPage = 1;
-
-    // Obtener elementos del DOM
-    var priceMinSlider = document.getElementById('filter-price-range');
-    var priceMaxSlider = document.getElementById('filter-price-range-max');
-    var priceMinInput = document.getElementById('price-min-input');
-    var priceMaxInput = document.getElementById('price-max-input');
-    // Inicializar gráfico
-    var expensesChart;
+    // Función para actualizar el valor según el ancho actual
+    function updateRowsPerPage() {
+        const newRows = window.innerWidth <= 768 ? 5 : 10;
+        if (newRows !== rowsPerPage) {
+            rowsPerPage = newRows;
+            fetchExpenses();
+        }
+    }
     // Actualizar etiquetas del rango de precios
     function updatePriceLabels() {
         let minValue = parseInt(priceMinSlider.value);
@@ -343,8 +350,6 @@ $role = $_SESSION['role'];
             console.error('Error al cargar los gastos:', error);
         }
     }
-    var username = "<?php echo $username; ?>";
-    var role = "<?php echo $role; ?>";
 
     function renderTable() {
         const tableBody = document.getElementById('expense-table-body');
@@ -453,10 +458,6 @@ $role = $_SESSION['role'];
             }
         });
     }
-    // Llamar a renderChart con datos filtrados o iniciales
-    fetchExpenses().then(() => {
-        renderChart(filteredExpenses); // Usar datos iniciales al cargar la página
-    });
 
     function calculateTotals(allData, filteredData) {
         // Calcular el total de todos los gastos (sin filtrar)

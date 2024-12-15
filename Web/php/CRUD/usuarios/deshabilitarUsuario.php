@@ -1,5 +1,11 @@
 <?php
-session_start();
+session_start(); // Iniciar la sesión
+// Verificar si la sesión está activa
+if (!isset($_SESSION['access_token']) || $_SESSION['role'] !== "Admin") {
+    // Redirigir al usuario a la página prohibida
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 // Incluir el archivo de configuración
 require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/config.php');
 // Verificar que se recibió una solicitud PUT

@@ -1,5 +1,11 @@
 <?php
+session_start(); // Iniciar la sesión
 // Verificar si la sesión está activa
+if (!isset($_SESSION['access_token']) || $_SESSION['role'] !== "Admin") {
+    // Redirigir al usuario a la página prohibida
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 include('../../../www/conexion.php'); // Conexión a la base de datos
 try {
     // Obtener los escaneos del usuario

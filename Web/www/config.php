@@ -7,7 +7,7 @@ $redirect_uri = 'http://localhost/LWeb/Web/php/login/callback.php'; // URL de ca
 $redirect_uriLogOut = 'http://localhost/LWeb/Web/php/login/loginUnificado.php'; // URL del logout
 
 // Dirección IP de Keycloak
-$ip = '192.168.18.35:8080'; //Casa
+$ip = '192.168.18.36:8080'; //Casa
 // URLs de Keycloak
 $keycloak_url = 'http://' . $ip . '/realms/' . $realm . '/protocol/openid-connect/auth';
 $token_url = 'http://' . $ip . '/realms/' . $realm . '/protocol/openid-connect/token';

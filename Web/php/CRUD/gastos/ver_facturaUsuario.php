@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['access_token'])) {
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 // Verificar si la sesión está activa
 include('../../../www/conexion.php'); // Conexión a la base de datos
 
