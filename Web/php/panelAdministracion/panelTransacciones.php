@@ -86,10 +86,12 @@ $role = $_SESSION['role'];
     <table class="table table-striped" id="expense-table">
         <thead>
             <tr>
+                <th>Id</th>
                 <th>Descripción</th>
                 <th>Monto (€)</th>
                 <th>Fecha</th>
                 <th>Factura</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -129,7 +131,6 @@ $role = $_SESSION['role'];
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = Math.min(startIndex + itemsPerPage, transactions.length);
 
-        // Añadir filas con datos reales
         for (let i = startIndex; i < endIndex; i++) {
             const transaction = transactions[i];
             const facturaRuta = transaction.factura ?
@@ -139,30 +140,35 @@ $role = $_SESSION['role'];
                 null;
 
             const row = `
-            <tr>
-                <td>${transaction.descripcion}</td>
-                <td>${transaction.monto}</td>
-                <td>${new Date(transaction.fecha).toLocaleDateString()}</td>
-                <td>${facturaRuta ? `<a href="${facturaRuta}" target="_blank">Ver Factura</a>` : 'Sin ticket'}</td>
-            </tr>
+        <tr>
+            <td>${transaction.id}</td>
+            <td>${transaction.descripcion}</td>
+            <td>${transaction.monto}</td>
+            <td>${new Date(transaction.fecha).toLocaleDateString()}</td>
+            <td>${facturaRuta ? `<a href="${facturaRuta}" target="_blank">Ver Factura</a>` : 'Sin ticket'}</td>
+            <td>
+                <button class="btn btn-danger btn-sm" onclick="deleteExpense(${transaction.id}, '${facturaRuta}')">Eliminar</button>
+            </td>
+        </tr>
         `;
             expenseTableBody.insertAdjacentHTML('beforeend', row);
         }
 
-        // Añadir filas vacías para completar hasta 10 registros si es necesario
         const totalRows = endIndex - startIndex;
         for (let i = totalRows; i < itemsPerPage; i++) {
             const emptyRow = `
-            <tr class="empty-row">
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
+        <tr class="empty-row">
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
         `;
             expenseTableBody.insertAdjacentHTML('beforeend', emptyRow);
         }
     }
+
 
     function renderPagination() {
         const totalPages = Math.ceil(transactions.length / itemsPerPage);
@@ -209,6 +215,50 @@ $role = $_SESSION['role'];
                 }
             })
             .catch(error => console.error('Error al añadir el gasto:', error));
+    }
+
+    function cleanPath(path) {
+        // Eliminar secuencias peligrosas ../ o ..\ y asegurarse de que la ruta sea válida
+        const cleanedPath = path.replace(/(\.\.\/|\.\\)/g, '').replace(/^\/+/, '');
+        // Prepend la base del proyecto (lweb) para asegurar rutas correctas
+        return `/lweb/${cleanedPath}`;
+    }
+
+    function deleteExpense(id, facturaRuta) {
+        // Limpiar y ajustar la ruta antes de enviarla
+        const safeFacturaRuta = cleanPath(facturaRuta);
+
+        console.log("Datos enviados al servidor:", {
+            id,
+            facturaRuta: safeFacturaRuta
+        });
+
+        if (!confirm("¿Estás seguro de que deseas eliminar esta factura y su archivo asociado?")) {
+            return;
+        }
+
+        const data = {
+            id,
+            facturaRuta: safeFacturaRuta
+        };
+
+        fetch('../php/CRUD/gastos/eliminar_factura.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Factura eliminada correctamente.");
+                    loadExpenses();
+                } else {
+                    alert("Error al eliminar la factura: " + data.error);
+                }
+            })
+            .catch(error => console.error('Error al eliminar la factura:', error));
     }
 
     function validateForm() {
