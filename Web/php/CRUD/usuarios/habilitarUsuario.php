@@ -33,6 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         'grant_type' => 'client_credentials',
     ]));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -59,6 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     ]);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($userUpdateData));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

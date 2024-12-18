@@ -14,30 +14,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = filter_var($input['id'] ?? 0, FILTER_VALIDATE_INT);
     $facturaRuta = filter_var($input['facturaRuta'] ?? '', FILTER_SANITIZE_STRING);
 
-    if (!$id || !$facturaRuta) {
+    if (!$id || (!$facturaRuta && $facturaRuta !== '/lweb/null')) {
         echo json_encode(['success' => false, 'error' => 'ID o ruta de la factura no válida.']);
         exit();
     }
 
-    // Convertir la ruta relativa en absoluta
-    $ruta_completa = realpath($_SERVER['DOCUMENT_ROOT'] . '/' . ltrim(str_replace('../', '', $facturaRuta), '/'));
-
-    if (!$ruta_completa || !file_exists($ruta_completa)) {
-        error_log("El archivo no existe o la ruta es inválida: " . $facturaRuta);
-        echo json_encode(['success' => false, 'error' => 'Archivo no encontrado o ruta inválida.']);
-        exit();
-    }
-
-
     try {
         $conn->beginTransaction();
 
-        // Intentar eliminar el archivo
-        if (!unlink($ruta_completa)) {
-            error_log("Error al eliminar archivo: " . $ruta_completa);
-            echo json_encode(['success' => false, 'error' => 'No se pudo eliminar el archivo asociado.']);
-            $conn->rollBack();
-            exit();
+        // Si la ruta no es '/lweb/null', proceder con la eliminación del archivo
+        if ($facturaRuta !== '/lweb/null') {
+            // Convertir la ruta relativa en absoluta
+            $ruta_completa = realpath($_SERVER['DOCUMENT_ROOT'] . '/' . ltrim(str_replace('../', '', $facturaRuta), '/'));
+
+            if (!$ruta_completa || !file_exists($ruta_completa)) {
+                error_log("El archivo no existe o la ruta es inválida: " . $facturaRuta);
+                echo json_encode(['success' => false, 'error' => 'Archivo no encontrado o ruta inválida.']);
+                $conn->rollBack();
+                exit();
+            }
+
+            // Intentar eliminar el archivo
+            if (!unlink($ruta_completa)) {
+                error_log("Error al eliminar archivo: " . $ruta_completa);
+                echo json_encode(['success' => false, 'error' => 'No se pudo eliminar el archivo asociado.']);
+                $conn->rollBack();
+                exit();
+            }
         }
 
         // Eliminar el registro de la base de datos

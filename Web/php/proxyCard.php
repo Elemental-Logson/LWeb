@@ -1,4 +1,11 @@
 <?php
+session_start();
+if (!isset($_SESSION['access_token'])) {
+    // Redirigir si no hay sesión activa
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
+
 header('Content-Type: application/json');
 
 // Verifica el parámetro

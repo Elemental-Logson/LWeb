@@ -116,12 +116,13 @@ $role = $_SESSION['role'];
 
 
     if (expenseModal) {
-        expenseModal.addEventListener('hidden.bs.modal', function () {
+        expenseModal.addEventListener('hidden.bs.modal', function() {
             const form = document.getElementById('expense-form');
             form.reset(); // Limpiar todos los campos del formulario
             document.querySelectorAll(".error-message").forEach(el => el.remove());
         });
     }
+
     function loadExpenses() {
         fetch('../php/CRUD/gastos/ver_facturaUsuario.php')
             .then(response => response.json())
@@ -233,12 +234,25 @@ $role = $_SESSION['role'];
         // Eliminar secuencias peligrosas ../ o ..\ y asegurarse de que la ruta sea válida
         const cleanedPath = path.replace(/(\.\.\/|\.\\)/g, '').replace(/^\/+/, '');
         // Prepend la base del proyecto (lweb) para asegurar rutas correctas
+        return `/LWeb/${cleanedPath}`;
+    }
+
+    function cleanPath2(path) {
+        // Eliminar secuencias peligrosas ../ o ..\ y asegurarse de que la ruta sea válida
+        const cleanedPath = path.replace(/(\.\.\/|\.\\)/g, '').replace(/^\/+/, '');
+        // Prepend la base del proyecto (lweb) para asegurar rutas correctas
         return `/lweb/${cleanedPath}`;
     }
 
     function deleteExpense(id, facturaRuta) {
-        // Limpiar y ajustar la ruta antes de enviarla
-        const safeFacturaRuta = cleanPath(facturaRuta);
+        var safeFacturaRuta;
+        if (facturaRuta.toLowerCase().includes('null')) {
+            // Llama a cleanPad1 si contiene "null"
+            safeFacturaRuta = cleanPath2(facturaRuta);
+        } else {
+            // Llama a cleanPad2 en caso contrario
+            safeFacturaRuta = cleanPath(facturaRuta);
+        }
 
         console.log("Datos enviados al servidor:", {
             id,

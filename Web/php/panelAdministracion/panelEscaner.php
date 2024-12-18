@@ -106,62 +106,66 @@ if (!defined('ACCESO_PERMITIDO')) {
 
 <script>
     loadScan();
-    document.querySelector('.btn-primary.w-100').addEventListener('click', function() {
-        const targetRange = document.getElementById('targetRange').value;
-        const scanName = document.getElementById('scanName').value;
-        const portRange = document.getElementById('portRange').value || "1-1024";
-        const scanIntensity = document.getElementById('scanIntensity').value;
-        const scanType = document.getElementById('scanType').value;
+    document.querySelector('.btn-primary.w-100').addEventListener('click', function () {
+    const targetRange = document.getElementById('targetRange').value;
+    const scanName = document.getElementById('scanName').value;
+    const portRange = document.getElementById('portRange').value || "1-1024";
+    const scanIntensity = document.getElementById('scanIntensity').value;
+    const scanType = document.getElementById('scanType').value;
 
-        if (!targetRange || !scanName) {
-            alert("Por favor, completa todos los campos obligatorios.");
-            return;
-        }
+    if (!targetRange || !scanName) {
+        alert("Por favor, completa todos los campos obligatorios.");
+        return;
+    }
 
-        const requestBody = {
-            target_ip: targetRange,
-            scan_name: scanName,
-            ports: portRange,
-            intensity: scanIntensity
-        };
+    const requestBody = {
+        target_ip: targetRange,
+        scan_name: scanName,
+        ports: portRange,
+        intensity: scanIntensity
+    };
 
-        let endpoint = '';
-        if (scanType === 'ports_services') {
-            endpoint = '/scan/ports-services';
-        } else if (scanType === 'vulnerabilities') {
-            endpoint = '/scan/vulnerabilities';
-        }
+    let endpoint = '';
+    if (scanType === 'ports_services') {
+        endpoint = '/scan/ports-services';
+    } else if (scanType === 'vulnerabilities') {
+        endpoint = '/scan/vulnerabilities';
+    }
 
-        // Mostrar modal de cargando
-        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-        loadingModal.show();
+    // Mostrar modal de cargando
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    loadingModal.show();
 
-        fetch(`http://192.168.18.4:8001${endpoint}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error al realizar la solicitud');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Respuesta del servidor:', data);
-                alert("Escaneo iniciado con éxito.");
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Hubo un problema al iniciar el escaneo.");
-            })
-            .finally(() => {
-                // Ocultar modal de cargando
-                loadingModal.hide();
-            });
-    });
+    // Hacer la solicitud a escaner.php
+    fetch('../php/escaner.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                endpoint: endpoint, // Ruta para la API
+                data: requestBody   // Datos necesarios para el escaneo
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al realizar la solicitud');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Respuesta del servidor:', data);
+            alert("Escaneo iniciado con éxito.");
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Hubo un problema al iniciar el escaneo.");
+        })
+        .finally(() => {
+            // Ocultar modal de cargando
+            loadingModal.hide();
+        });
+});
 
 
     function loadScan() {
