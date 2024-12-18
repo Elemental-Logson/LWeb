@@ -1,8 +1,6 @@
 <?php
-session_start();
-
 // Incluir el archivo de configuración
-require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/config2.php');
 
 // Verificar si el código de autenticación está presente en la URL
 if (isset($_GET['code'])) {
@@ -27,11 +25,7 @@ if (isset($_GET['code'])) {
     // TEMPORALMENTE (no usar en producción si el certificado no es válido)
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-    // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-    // Opcional: activar el modo verbose para depurar
-    // curl_setopt($ch, CURLOPT_VERBOSE, true);
-    
+
     $response = curl_exec($ch);
 
     if ($response === false) {
@@ -47,11 +41,8 @@ if (isset($_GET['code'])) {
 
     // Verificar si se obtuvo un token
     if (isset($response_data['access_token'])) {
-        $_SESSION['access_token'] = $response_data['access_token'];
-        $_SESSION['refresh_token'] = $response_data['refresh_token'];
-
         // Obtener el token de acceso
-        $access_token = $_SESSION['access_token'];
+        $access_token = $response_data['access_token'];
 
         // Dividir el JWT en sus partes
         $token_parts = explode('.', $access_token);
@@ -83,16 +74,15 @@ if (isset($_GET['code'])) {
                 $role = 'Admin';
             }
 
-            // Guardamos en sesión
-            $_SESSION["username"] = $username;
-            $_SESSION["role"] = $role;
-            $_SESSION["email"] = $email;
-            $_SESSION["given_name"] = $givenName;
-            $_SESSION["family_name"] = $familyName;
-            $_SESSION["auth_time"] = $inicioSesionHora;
-
-            // Redirigir a la página de login
-            header('Location: ../dashboard.php');
+            // Imprimir datos del usuario
+            echo $username . "<br>";
+            echo $role . "<br>";
+            echo $email . "<br>";
+            echo $givenName . "<br>";
+            echo $familyName . "<br>";
+            echo $inicioSesionHora . "<br>";
+            
+            // header('Location: ../dashboard.php');
             exit;
         } else {
             echo '<h3>Error:</h3>';

@@ -1,13 +1,13 @@
 <?php
-session_start(); // Inicia la sesión
-
+session_start(); // Iniciar la sesión
 // Verificar si la sesión está activa
-if (!isset($_SESSION['username'])) {
-    die(json_encode(["error" => "Acceso denegado: No has iniciado sesión."]));
+if (!isset($_SESSION['access_token']) || $_SESSION['role'] !== "Admin") {
+    // Redirigir al usuario a la página prohibida
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
 }
-
+// Verificar si la sesión está activa
 include('../../../www/conexion.php'); // Conexión a la base de datos
-
 // Verificar si el método es DELETE
 if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
     // Obtener el cuerpo de la solicitud y decodificarlo como JSON

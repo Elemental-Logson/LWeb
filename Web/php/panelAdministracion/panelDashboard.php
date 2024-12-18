@@ -1,3 +1,13 @@
+<?php
+if (!defined('ACCESO_PERMITIDO')) {
+    // header('HTTP/1.0 403 Forbidden');
+    // exit('No tienes permiso para acceder directamente a este archivo.');
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
+$username = htmlspecialchars($_SESSION['username'] ?? 'Usuario');
+$role = $_SESSION['role'];
+?>
 <style>
     /* Contenedor de Slider */
     .range-container {
@@ -96,9 +106,11 @@
         <h1>Gestión de Gastos</h1>
         <div class="btn-group mt-3 mt-md-0">
             <button id="apply-filters" class="btn btn-primary"><i class="bi bi-search"></i></button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#chartModal"><i class="bi bi-bar-chart-fill"></i></button>
             <button id="clear-filters" class="btn btn-danger"><i class="bi bi-x-circle"></i></button>
         </div>
     </div>
+
     <div class="row mb-4">
         <div class="col-6">
             <div class="card">
@@ -117,11 +129,17 @@
             </div>
         </div>
     </div>
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <canvas id="expenses-chart" class="w-100 h-auto" style="min-height: 300px;"></canvas>
+
+    <!-- Modal -->
+    <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chartModalLabel">Gráfico de Gastos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <canvas id="expenses-chart-modal" class="w-100 h-auto" style="min-height: 300px;"></canvas>
                 </div>
             </div>
         </div>
@@ -191,25 +209,32 @@
 </div>
 
 <script>
-    // fetchExpenses();
-    // Llamar a calculateTotals al cargar datos iniciales
-    fetchExpenses().then(() => {
-        calculateTotals(expenses); // Usar todos los datos al inicio
-        renderChart(filteredExpenses);
-    });
-
     var expenses = [];
     var filteredExpenses = [];
-    var rowsPerPage = 10;
+    var rowsPerPage = window.innerWidth <= 768 ? 5 : 10;
     var currentPage = 1;
-
-    // Obtener elementos del DOM
     var priceMinSlider = document.getElementById('filter-price-range');
     var priceMaxSlider = document.getElementById('filter-price-range-max');
     var priceMinInput = document.getElementById('price-min-input');
     var priceMaxInput = document.getElementById('price-max-input');
-    // Inicializar gráfico
     var expensesChart;
+    var username = "<?php echo $username; ?>";
+    var role = "<?php echo $role; ?>";
+    // Llamar a calculateTotals al cargar datos iniciales
+    fetchExpenses().then(() => {
+        calculateTotals(expenses, expenses); // Usar todos los datos al inicio
+        renderChart(filteredExpenses);
+    });
+    window.addEventListener('resize', updateRowsPerPage);
+
+    // Función para actualizar el valor según el ancho actual
+    function updateRowsPerPage() {
+        const newRows = window.innerWidth <= 768 ? 5 : 10;
+        if (newRows !== rowsPerPage) {
+            rowsPerPage = newRows;
+            fetchExpenses();
+        }
+    }
     // Actualizar etiquetas del rango de precios
     function updatePriceLabels() {
         let minValue = parseInt(priceMinSlider.value);
@@ -302,7 +327,7 @@
         renderPagination();
 
         // Actualizar totales y gráfico
-        calculateTotals(filteredExpenses);
+        calculateTotals(expenses, filteredExpenses);
         renderChart(filteredExpenses);
     });
 
@@ -335,12 +360,23 @@
         const currentPageData = filteredExpenses.slice(startIndex, endIndex);
 
         currentPageData.forEach(expense => {
+            // Generar la ruta dependiendo del rol
+            const facturaRuta = expense.factura ?
+                (role === 'Admin' ?
+                    `../../img/${expense.nombre_usuario}/${expense.factura}` :
+                    `../../img/${username}/${expense.factura}`) :
+                null;
+
             const row = `
             <tr>
                 <td>${expense.descripcion}</td>
                 <td>${expense.monto}</td>
                 <td>${new Date(expense.fecha).toLocaleDateString()}</td>
-                <td><a href="../../img/${expense.factura}" target="_blank">Ver Factura</a></td>
+                <td>
+                    ${facturaRuta 
+                        ? `<a href="${facturaRuta}" target="_blank">Ver Factura</a>`
+                        : 'Sin ticket'}
+                </td>
             </tr>
         `;
             tableBody.insertAdjacentHTML('beforeend', row);
@@ -374,7 +410,7 @@
         const groupedData = groupExpensesByDate(data); // Agrupar por día
         const chartData = prepareChartData(groupedData); // Preparar datos del gráfico
 
-        const ctx = document.getElementById('expenses-chart').getContext('2d');
+        const ctx = document.getElementById('expenses-chart-modal').getContext('2d');
 
         // Si el gráfico ya existe, destrúyelo para actualizarlo
         if (expensesChart) {
@@ -396,8 +432,8 @@
                         callbacks: {
                             label: function(tooltipItem) {
                                 return `€ ${tooltipItem.raw.toLocaleString('es-ES', {
-                            minimumFractionDigits: 2
-                        })}`;
+                                minimumFractionDigits: 2
+                            })}`;
                             }
                         }
                     }
@@ -422,19 +458,16 @@
             }
         });
     }
-    // Llamar a renderChart con datos filtrados o iniciales
-    fetchExpenses().then(() => {
-        renderChart(filteredExpenses); // Usar datos iniciales al cargar la página
-    });
 
-    function calculateTotals(data) {
-        // Calcular el total de todos los gastos
-        const total = data.reduce((sum, expense) => sum + parseFloat(expense.monto), 0);
+    function calculateTotals(allData, filteredData) {
+        // Calcular el total de todos los gastos (sin filtrar)
+        const total = allData.reduce((sum, expense) => sum + parseFloat(expense.monto), 0);
 
         // Calcular el total de los gastos del mes actual
         const currentMonth = new Date().getMonth(); // Mes actual (0-11)
         const currentYear = new Date().getFullYear(); // Año actual
-        const monthlyTotal = data
+
+        const monthlyTotal = allData
             .filter(expense => {
                 const expenseDate = new Date(expense.fecha);
                 return (
@@ -448,10 +481,12 @@
         document.getElementById('total-expenses').innerText = total.toLocaleString('es-ES', {
             minimumFractionDigits: 2
         });
+
         document.getElementById('monthly-expenses').innerText = monthlyTotal.toLocaleString('es-ES', {
             minimumFractionDigits: 2
         });
     }
+
 
     function groupExpensesByDate(data) {
         // Ordenar por fecha ascendente
@@ -504,5 +539,8 @@
             datasets
         };
     }
+    document.getElementById('chartModal').addEventListener('shown.bs.modal', () => {
+        renderChart(filteredExpenses); // Renderiza el gráfico con los datos filtrados
+    });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

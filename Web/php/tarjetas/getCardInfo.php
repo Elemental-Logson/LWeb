@@ -1,5 +1,4 @@
 <?php
-
 // Función para realizar la solicitud cURL a la API
 function getDataFromApi($url)
 {

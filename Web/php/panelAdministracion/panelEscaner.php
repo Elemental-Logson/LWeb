@@ -1,14 +1,24 @@
-<div class="container mt-5">
+<?php
+if (!defined('ACCESO_PERMITIDO')) {
+    // header('HTTP/1.0 403 Forbidden');
+    // exit('No tienes permiso para acceder directamente a este archivo.');
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
+?>
+<div class="container my-5">
     <div class="row">
-        <div class="col-md-12">
-            <h3>Panel de Escáner de Red y Vulnerabilidades</h3>
-            <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#scannerModal">Iniciar Escaneo</button>
+        <div class="col-12 col-md-6">
+            <h3 class="text-center text-md-start">Panel de Escáner de Red y Vulnerabilidades</h3>
+        </div>
+        <div class="col-12 col-md-6 text-center text-md-end">
+            <button type="button" class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#scannerModal">Iniciar Escaneo</button>
         </div>
     </div>
 
     <!-- Modal Escáner -->
     <div class="modal fade" id="scannerModal" tabindex="-1" aria-labelledby="scannerModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="scannerModalLabel">Escáner de Red y Vulnerabilidades</h5>
@@ -51,11 +61,11 @@
     </div>
 
     <!-- Resultados Escaner -->
-    <div id="scanTableContainer" class="container mt-5">
-        <!-- Tabla Scan -->
-        <div class="table-responsive mt-4">
-            <table class="table table-bordered">
-                <thead>
+    <div id="scanTableContainer" class="mt-5">
+        <h5 class="text mt-3">Resultados del Escáner</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
@@ -70,74 +80,92 @@
         </div>
     </div>
 
+
     <!-- Contenedor para los detalles del escaneo -->
-    <div id="scanDetailsContainer" class="container mt-4 hidden">
+    <div id="scanDetailsContainer" class="mt-4">
         <!-- Aquí se mostrarán los detalles del escaneo seleccionado -->
     </div>
 
     <!-- Contenedor para las vulnerabilidades -->
-    <div id="vulnerabilitiesContainer" class="container mt-4 hidden">
+    <div id="vulnerabilitiesContainer" class="mt-4">
         <!-- Aquí se mostrarán las vulnerabilidades de la IP seleccionada -->
+    </div>
+</div>
+<div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+            <div class="modal-body">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3">Ejecutando escaneo, por favor espera...</p>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     loadScan();
+    document.querySelector('.btn-primary.w-100').addEventListener('click', function () {
+    const targetRange = document.getElementById('targetRange').value;
+    const scanName = document.getElementById('scanName').value;
+    const portRange = document.getElementById('portRange').value || "1-1024";
+    const scanIntensity = document.getElementById('scanIntensity').value;
+    const scanType = document.getElementById('scanType').value;
 
+    if (!targetRange || !scanName) {
+        alert("Por favor, completa todos los campos obligatorios.");
+        return;
+    }
 
+    const requestBody = {
+        target_ip: targetRange,
+        scan_name: scanName,
+        ports: portRange,
+        intensity: scanIntensity
+    };
 
-    document.querySelector('.btn-primary.w-100').addEventListener('click', function() {
-        const targetRange = document.getElementById('targetRange').value;
-        const scanName = document.getElementById('scanName').value;
-        const portRange = document.getElementById('portRange').value || "1-1024";
-        const scanIntensity = document.getElementById('scanIntensity').value;
-        const scanType = document.getElementById('scanType').value;
+    let endpoint = '';
+    if (scanType === 'ports_services') {
+        endpoint = '/scan/ports-services';
+    } else if (scanType === 'vulnerabilities') {
+        endpoint = '/scan/vulnerabilities';
+    }
 
-        // Validación básica
-        if (!targetRange || !scanName) {
-            alert("Por favor, completa todos los campos obligatorios.");
-            return;
-        }
+    // Mostrar modal de cargando
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    loadingModal.show();
 
-        // Construir el cuerpo de la solicitud
-        const requestBody = {
-            targetRange,
-            scanName,
-            portRange,
-            scanIntensity
-        };
-
-        // Determinar el endpoint según el tipo de escaneo
-        let endpoint = '';
-        if (scanType === 'ports_services') {
-            endpoint = '/scan/ports-services';
-        } else if (scanType === 'vulnerabilities') {
-            endpoint = '/scan/vulnerabilities';
-        }
-
-        // Realizar la solicitud a la API
-        fetch(`http://10.11.0.147:8000${endpoint}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error al realizar la solicitud');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Respuesta del servidor:', data);
-                alert("Escaneo iniciado con éxito.");
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Hubo un problema al iniciar el escaneo.");
-            });
-    });
+    // Hacer la solicitud a escaner.php
+    fetch('../php/escaner.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                endpoint: endpoint, // Ruta para la API
+                data: requestBody   // Datos necesarios para el escaneo
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al realizar la solicitud');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Respuesta del servidor:', data);
+            alert("Escaneo iniciado con éxito.");
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Hubo un problema al iniciar el escaneo.");
+        })
+        .finally(() => {
+            // Ocultar modal de cargando
+            loadingModal.hide();
+        });
+});
 
 
     function loadScan() {
@@ -175,9 +203,10 @@
             .then(response => response.json())
             .then(data => {
                 let detailsContent = `
-                <h5>Detalles del Escaneo ID: ${scanId}</h5>
-                <table class="table table-bordered">
-                    <thead>
+            <h5 class="text-center mt-3">Detalles del Escaneo ID: ${scanId}</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
                         <tr>
                             <th>ID</th>
                             <th>Host</th>
@@ -187,34 +216,49 @@
                         </tr>
                     </thead>
                     <tbody>
-                `;
+            `;
 
                 data.forEach(ip => {
                     detailsContent += `
-                    <tr>
-                        <td>${ip.id}</td>
-                        <td>${ip.host}</td>
-                        <td>${ip.hostname}</td>
-                        <td>${ip.state}</td>
-                        <td>
-                            <a href="#" onclick="viewVulnerabilities(${ip.id})">Ver Vulnerabilidades</a> |
-                            <a href="#" onclick="deleteScannedIp(${ip.id})">Eliminar</a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>${ip.id}</td>
+                    <td>${ip.host}</td>
+                    <td class="text-truncate" style="max-width: 150px;" title="${ip.hostname}">
+                        ${ip.hostname}
+                    </td>
+                    <td class="text-truncate" style="max-width: 100px;" title="${ip.state}">
+                        ${ip.state}
+                    </td>
+                    <td>
+                        <a href="#"   onclick="viewVulnerabilities(${ip.id})">Ver Vulnerabilidades</a>
+                        <a href="#"   onclick="deleteScannedIp(${ip.id})">Eliminar</a>
+                    </td>
+                </tr>
                 `;
                 });
 
                 detailsContent += `
                     </tbody>
                 </table>
-                <button class="btn btn-secondary mt-3" onclick="goBackToMainTable()">Volver</button>
-                `;
+            </div>
+            <button class="btn btn-secondary mt-3 w-100" onclick="goBackToMainTable()">Volver</button>
+            `;
 
                 // Mostrar los detalles del escaneo
                 scanDetailsContainer.innerHTML = detailsContent;
                 scanDetailsContainer.style.display = 'block';
             })
             .catch(error => console.error('Error al cargar los detalles del escaneo:', error));
+    }
+
+    function sanitizeText(text) {
+        if (!text) return ""; // Si es nulo o indefinido, retorna una cadena vacía
+        return text
+            .replace(/'/g, "\\'") // Escapa comillas simples
+            .replace(/"/g, '\\"') // Escapa comillas dobles
+            .replace(/\n/g, "\\n") // Escapa saltos de línea
+            .replace(/\r/g, "\\r") // Escapa retornos de carro
+            .replace(/\\/g, "\\\\"); // Escapa barras invertidas
     }
 
     function viewVulnerabilities(scannedIpId) {
@@ -226,9 +270,10 @@
             .then(response => response.json())
             .then(data => {
                 let vulnerabilitiesContent = `
-                <h5>Vulnerabilidades para la IP ID: ${scannedIpId}</h5>
-                <table class="table table-bordered">
-                    <thead>
+            <h5 class="text mt-3">Vulnerabilidades para la IP ID: ${scannedIpId}</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
                         <tr>
                             <th>ID</th>
                             <th>Puerto</th>
@@ -241,30 +286,42 @@
                         </tr>
                     </thead>
                     <tbody>
-                `;
+            `;
 
                 data.forEach(detail => {
+                    const scriptOutput = detail.script_output || "Sin salida del script";
+                    const sanitizedScriptOutput = sanitizeText(scriptOutput);
+                    const displayText = scriptOutput.length > 50 ?
+                        `${scriptOutput.substring(0, 50)}...` :
+                        scriptOutput;
+
                     vulnerabilitiesContent += `
-                    <tr>
-                        <td>${detail.id}</td>
-                        <td>${detail.port}</td>
-                        <td>${detail.protocol}</td>
-                        <td>${detail.service}</td>
-                        <td>${detail.version}</td>
-                        <td>${detail.product}</td>
-                        <td>${detail.script_output}</td>
-                        <td>
-                            <a href="#" onclick="deleteVulnerability(${detail.id})">Eliminar</a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>${detail.id}</td>
+                    <td>${detail.port}</td>
+                    <td>${detail.protocol}</td>
+                    <td>${detail.service}</td>
+                    <td>${detail.version}</td>
+                    <td>${detail.product}</td>
+                    <td>
+                        <div class="text-truncate" style="max-width: 200px;" title="Haz clic para ver más" 
+                             onclick="showFullText('${sanitizedScriptOutput}')">
+                            ${displayText}
+                        </div>
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-danger btn-sm" onclick="deleteVulnerability(${detail.id})">Eliminar</a>
+                    </td>
+                </tr>
                 `;
                 });
 
                 vulnerabilitiesContent += `
                     </tbody>
                 </table>
-                <button class="btn btn-secondary mt-3" onclick="goBackToScanDetails()">Volver</button>
-                `;
+            </div>
+            <button class="btn btn-secondary mt-3 w-100" onclick="goBackToScanDetails()">Volver</button>
+            `;
 
                 // Mostrar las vulnerabilidades en su contenedor específico
                 const vulnerabilitiesContainer = document.getElementById('vulnerabilitiesContainer');
@@ -274,6 +331,54 @@
             })
             .catch(error => console.error('Error al cargar las vulnerabilidades:', error));
     }
+
+    function showFullText(scriptOutput) {
+        const decodedText = decodeURIComponent(scriptOutput);
+
+        // Crear el modal dinámicamente
+        const modalContent = `
+        <div class="modal fade" id="textModal" tabindex="-1" aria-labelledby="textModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="textModalLabel">Salida del Script</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <pre style="white-space: pre-wrap;">${decodedText}</pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+        // Verificar si el modal ya existe y eliminarlo
+        const existingModal = document.getElementById('textModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Insertar el modal en el DOM
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalContent.trim();
+        document.body.appendChild(modalContainer);
+
+        // Esperar a que el modal esté completamente cargado en el DOM antes de inicializarlo
+        setTimeout(() => {
+            const modalElement = document.getElementById('textModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+
+            // Eliminar el modal del DOM cuando se cierre
+            modalElement.addEventListener('hidden.bs.modal', () => {
+                modalElement.remove();
+            });
+        }, 0);
+    }
+
 
     function goBackToMainTable() {
         // Mostrar la tabla principal y ocultar los contenedores de detalles y vulnerabilidades

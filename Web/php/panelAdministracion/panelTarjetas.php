@@ -1,3 +1,11 @@
+<?php
+if (!defined('ACCESO_PERMITIDO')) {
+    // header('HTTP/1.0 403 Forbidden');
+    // exit('No tienes permiso para acceder directamente a este archivo.');
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
+?>
 <style>
     /* Estilo general de las tarjetas */
     .card {
@@ -201,10 +209,7 @@
         setActiveCard(cardType);
 
         // Construye la URL según el tipo de tarjeta
-        const url =
-            cardType === 'credito' ?
-            'http://10.11.0.25:4000/enableCard2/user1/CREDIT' :
-            'http://10.11.0.25:4000/enableCard2/user1/DEBIT';
+        const url = `../php/proxyCard.php?cardType=${cardType === 'credito' ? 'CREDIT' : 'DEBIT'}`;
 
         try {
             const response = await fetch(url);
@@ -212,12 +217,11 @@
                 throw new Error('Error al actualizar la tarjeta activa');
             }
             const result = await response.text();
-            // console.log('Respuesta del servidor:', result);
+            console.log('Respuesta del servidor:', result);
         } catch (error) {
-            // console.error('Error al realizar la solicitud:', error);
+            console.error('Error al realizar la solicitud:', error);
         }
     }
-
 
     function setActiveCard(cardType) {
         const tarjetaCredito = document.getElementById('tarjetaCredito');

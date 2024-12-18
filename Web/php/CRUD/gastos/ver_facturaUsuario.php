@@ -1,20 +1,24 @@
 <?php
-session_start(); // Inicia la sesión
-
+session_start();
+if (!isset($_SESSION['access_token'])) {
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 // Verificar si la sesión está activa
-// if (!isset($_SESSION['username'])) {
-//     die(json_encode(["error" => "Acceso denegado: No has iniciado sesión."]));
-// }
-
 include('../../../www/conexion.php'); // Conexión a la base de datos
-
 $nombre_usuario = $_SESSION['username'];
 
 try {
     // Obtener las transacciones del usuario
-    $sql = "SELECT descripcion, monto, fecha, factura FROM gastos WHERE nombre_usuario = :nombre_usuario";
+    if ($_SESSION["role"] === "Admin") {
+        $sql = "SELECT id, descripcion, monto, fecha, factura, nombre_usuario FROM gastos";
+    } else {
+        $sql = "SELECT id, descripcion, monto, fecha, factura, nombre_usuario FROM gastos WHERE nombre_usuario = :nombre_usuario";
+    }
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':nombre_usuario', $nombre_usuario);
+    if ($_SESSION["role"] != "Admin") {
+        $stmt->bindParam(':nombre_usuario', $nombre_usuario);
+    }
     $stmt->execute();
 
     $transacciones = $stmt->fetchAll(PDO::FETCH_ASSOC);

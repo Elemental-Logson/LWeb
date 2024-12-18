@@ -1,8 +1,13 @@
 <?php
-session_start();
+session_start(); // Iniciar la sesión
+// Verificar si la sesión está activa
+if (!isset($_SESSION['access_token']) || $_SESSION['role'] !== "Admin") {
+    // Redirigir al usuario a la página prohibida
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 // Incluir el archivo de configuración
 require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/config.php');
-
 // Verificar que se envió una solicitud POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Leer el cuerpo de la solicitud
@@ -36,6 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'grant_type' => 'client_credentials',
     ]));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
     $response = curl_exec($ch);
 
@@ -85,6 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($userData));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
     $response = curl_exec($ch);
 

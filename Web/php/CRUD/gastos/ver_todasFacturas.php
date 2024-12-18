@@ -1,13 +1,13 @@
 <?php
-session_start(); // Inicia la sesión
-
-// Verificar si la sesión está activa
-if (!isset($_SESSION['username'])) {
-    die(json_encode(["error" => "Acceso denegado: No has iniciado sesión."]));
+session_start();
+if (!isset($_SESSION['access_token'])) {
+    // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
 }
-
+// Verificar si la sesión está activa
 include('../../../www/conexion.php'); // Conexión a la base de datos
-
+// Comprobar si hay un token de autenticación en la sesión
 try {
     // Obtener las transacciones del usuario
     $sql = "SELECT descripcion, monto, fecha, factura FROM gastos";

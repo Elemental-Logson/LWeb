@@ -1,7 +1,13 @@
 <?php
+session_start(); // Iniciar la sesión
+// Verificar si la sesión está activa
+if (!isset($_SESSION['access_token']) || $_SESSION['role'] !== "Admin") {
+    // Redirigir al usuario a la página prohibida
+    header("Location: /LWeb/Web/html/forbidden.html");
+    exit();
+}
 // Configuración de Keycloak
 require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/config.php');
-
 // Función para obtener el token de acceso
 function obtenerTokenDeAcceso($token_url, $client_id, $client_secret)
 {
@@ -16,6 +22,10 @@ function obtenerTokenDeAcceso($token_url, $client_id, $client_secret)
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/x-www-form-urlencoded',
     ]);
+
+    // Deshabilitar validación del certificado (no recomendado en producción)
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
     $response = curl_exec($ch);
 
@@ -32,6 +42,7 @@ function obtenerTokenDeAcceso($token_url, $client_id, $client_secret)
     }
 }
 
+
 // Función para obtener la lista de usuarios
 function obtenerUsuarios($users_url, $access_token)
 {
@@ -42,6 +53,10 @@ function obtenerUsuarios($users_url, $access_token)
         'Authorization: Bearer ' . $access_token,
         'Content-Type: application/json',
     ]);
+
+    // Deshabilitar validación del certificado
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
     $response = curl_exec($ch);
     if (curl_errno($ch)) {
@@ -57,13 +72,13 @@ function obtenerUsuarios($users_url, $access_token)
     }
 }
 
+
 try {
     // Obtener el token de acceso
     $access_token = obtenerTokenDeAcceso($token_url, $client_id, $client_secret);
 
     // Obtener la lista de usuarios
     $usuarios = obtenerUsuarios($users_url, $access_token);
-
     // Devolver los usuarios en formato JSON
     header('Content-Type: application/json');
     echo json_encode($usuarios);

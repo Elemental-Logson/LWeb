@@ -1,14 +1,16 @@
 <?php
 session_start(); // Iniciar la sesión
-
 // Comprobar si hay un token de autenticación en la sesión
 if (!isset($_SESSION['access_token'])) {
     // Si no hay token o el rol no es admin, destruir la sesión y redirigir al login
     session_unset();  // Elimina todas las variables de sesión
     session_destroy(); // Destruye la sesión
-    header('Location: /lweb/Web/php/login/loginUnificado.php'); // Redirige al login
+    header('Location: /LWeb/Web/php/login/loginUnificado.php'); // Redirige al login
     exit;
 }
+// Verificar el rol del usuario
+$role = $_SESSION['role'] ?? '';
+$username = htmlspecialchars($_SESSION['username'] ?? 'Usuario');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -23,6 +25,11 @@ if (!isset($_SESSION['access_token'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.min.css" />
     <link rel="stylesheet" href="../css/panelAdministracion.css">
+    <style>
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -33,35 +40,29 @@ if (!isset($_SESSION['access_token'])) {
                 <h3 class="mb-4">Panel MKDEH</h3>
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-white" id="dashboard-link"><i class="bi bi-speedometer"></i>
-                            Dashboard</a>
+                        <a href="#" class="nav-link text-white" id="dashboard-link"><i class="bi bi-speedometer"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item <?php echo $role !== 'Admin' ? 'hidden' : ''; ?>">
+                        <a href="#" class="nav-link text-white" id="usuarios-link"><i class="bi bi-people"></i> Usuarios</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-white" id="usuarios-link"><i class="bi bi-people"></i>
-                            Usuarios</a>
+                        <a href="#" class="nav-link text-white" id="transacciones-link"><i class="bi bi-wallet2"></i> Transacciones</a>
+                    </li>
+                    <li class="nav-item <?php echo $role !== 'Admin' ? 'hidden' : ''; ?>">
+                        <a href="#" class="nav-link text-white" id="escaner-link"><i class="bi bi-bug"></i> Escaner</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-white" id="transacciones-link"><i class="bi bi-wallet2"></i>
-                            Transacciones</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-white" id="escaner-link"><i class="bi bi-bug"></i>
-                            Escaner</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-white" id="tarjetas-link"><i class="bi bi-credit-card"></i>
-                            Tarjetas</a>
+                        <a href="#" class="nav-link text-white" id="tarjetas-link"><i class="bi bi-credit-card"></i> Tarjetas</a>
                     </li>
                 </ul>
             </div>
             <!-- Perfil del usuario -->
             <div id="user-profile" class="mt-4 border-top pt-3">
                 <!-- Nombre del usuario -->
-                <h3 class="mb-4"><?php echo $_SESSION['username']; ?></h3>
+                <h3 class="mb-4"><?php echo $username; ?></h3>
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-white" id="perfil-link"><i class="bi bi-person"></i>
-                            Ver Perfil</a>
+                        <a href="#" class="nav-link text-white" id="perfil-link"><i class="bi bi-person"></i> Ver Perfil</a>
                     </li>
                     <li class="nav-item">
                         <a href="../php/login/logout.php" class="nav-link text-white">
@@ -79,7 +80,7 @@ if (!isset($_SESSION['access_token'])) {
 
         <!-- Contenido Principal -->
         <div id="main-content" class="flex-grow-1 p-4">
-
+            <!-- Contenido dinámico -->
         </div>
     </div>
 
@@ -89,6 +90,15 @@ if (!isset($_SESSION['access_token'])) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="../js/panelAdministracion.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simular un clic en el enlace del Dashboard
+            const dashboardLink = document.getElementById('dashboard-link');
+            if (dashboardLink) {
+                dashboardLink.click();
+            }
+        });
+    </script>
 </body>
 
 </html>
