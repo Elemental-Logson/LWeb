@@ -79,13 +79,20 @@ if (!defined('ACCESO_PERMITIDO')) {
 </div>
 
 <script>
-    loadUsers();
-
-    // Función para cargar usuarios
     // Variables globales para la paginación
     var currentPage = 1;
     var itemsPerPage = 3;
+    var addUserModal = document.getElementById('addUserModal');
+    // Función para cargar usuarios
+    loadUsers();
 
+    if (addUserModal) {
+        addUserModal.addEventListener('hidden.bs.modal', function() {
+            const form = document.getElementById('addUserForm');
+            form.reset(); // Limpiar todos los campos del formulario
+            document.querySelectorAll(".error-message").forEach(el => el.remove());
+        });
+    }
     // Función para cargar usuarios
     function loadUsers() {
         fetch('../php/CRUD/usuarios/getUsuario.php')
@@ -298,9 +305,10 @@ if (!defined('ACCESO_PERMITIDO')) {
                     alert('Usuario añadido correctamente');
                     loadUsers();
 
-                    // Cerrar el modal después de añadir el usuario
-                    const addUserModal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
-                    addUserModal.hide();
+                    // Cerrar y limpiar el modal
+                    const userModal = bootstrap.Modal.getInstance(document.getElementById('addUserForm'));
+                    userModal.hide();
+                    form.reset(); // Limpia los campos del formulario
                 } else {
                     alert(`Error: ${data.message}`);
                 }

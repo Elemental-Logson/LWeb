@@ -91,11 +91,21 @@ if (!defined('ACCESO_PERMITIDO')) {
         <!-- Aquí se mostrarán las vulnerabilidades de la IP seleccionada -->
     </div>
 </div>
-
+<div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+            <div class="modal-body">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3">Ejecutando escaneo, por favor espera...</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     loadScan();
-
     document.querySelector('.btn-primary.w-100').addEventListener('click', function() {
         const targetRange = document.getElementById('targetRange').value;
         const scanName = document.getElementById('scanName').value;
@@ -103,22 +113,18 @@ if (!defined('ACCESO_PERMITIDO')) {
         const scanIntensity = document.getElementById('scanIntensity').value;
         const scanType = document.getElementById('scanType').value;
 
-        // Validación básica
         if (!targetRange || !scanName) {
             alert("Por favor, completa todos los campos obligatorios.");
             return;
         }
 
-        // Construir el cuerpo de la solicitud
         const requestBody = {
             target_ip: targetRange,
             scan_name: scanName,
-            ports: portRange, 
-            intensity: scanIntensity 
+            ports: portRange,
+            intensity: scanIntensity
         };
 
-
-        // Determinar el endpoint según el tipo de escaneo
         let endpoint = '';
         if (scanType === 'ports_services') {
             endpoint = '/scan/ports-services';
@@ -126,8 +132,10 @@ if (!defined('ACCESO_PERMITIDO')) {
             endpoint = '/scan/vulnerabilities';
         }
 
-        // Realizar la solicitud a la API
-        // fetch(`http://10.11.0.147:8000${endpoint}`, {
+        // Mostrar modal de cargando
+        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+        loadingModal.show();
+
         fetch(`http://192.168.18.4:8001${endpoint}`, {
                 method: 'POST',
                 headers: {
@@ -148,6 +156,10 @@ if (!defined('ACCESO_PERMITIDO')) {
             .catch(error => {
                 console.error('Error:', error);
                 alert("Hubo un problema al iniciar el escaneo.");
+            })
+            .finally(() => {
+                // Ocultar modal de cargando
+                loadingModal.hide();
             });
     });
 

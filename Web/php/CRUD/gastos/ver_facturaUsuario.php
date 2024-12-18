@@ -6,7 +6,6 @@ if (!isset($_SESSION['access_token'])) {
 }
 // Verificar si la sesión está activa
 include('../../../www/conexion.php'); // Conexión a la base de datos
-
 $nombre_usuario = $_SESSION['username'];
 
 try {

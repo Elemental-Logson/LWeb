@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 // Incluir el archivo de configuración
 require_once($_SERVER['DOCUMENT_ROOT'] . '/LWeb/Web/www/config2.php');
 

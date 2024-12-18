@@ -111,8 +111,17 @@ $role = $_SESSION['role'];
     var currentPage = 1;
     var itemsPerPage = 10;
     var transactions = [];
+    var expenseModal = document.getElementById('expenseModal');
     loadExpenses();
 
+
+    if (expenseModal) {
+        expenseModal.addEventListener('hidden.bs.modal', function () {
+            const form = document.getElementById('expense-form');
+            form.reset(); // Limpiar todos los campos del formulario
+            document.querySelectorAll(".error-message").forEach(el => el.remove());
+        });
+    }
     function loadExpenses() {
         fetch('../php/CRUD/gastos/ver_facturaUsuario.php')
             .then(response => response.json())
@@ -208,8 +217,11 @@ $role = $_SESSION['role'];
                 if (data.success) {
                     alert("Factura añadida correctamente.");
                     loadExpenses();
+
+                    // Cerrar y limpiar el modal
                     const expenseModal = bootstrap.Modal.getInstance(document.getElementById('expenseModal'));
                     expenseModal.hide();
+                    form.reset(); // Limpia los campos del formulario
                 } else {
                     alert("Error: " + data.error);
                 }
@@ -252,8 +264,8 @@ $role = $_SESSION['role'];
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert("Factura eliminada correctamente.");
                     loadExpenses();
+                    alert("Factura eliminada correctamente.");
                 } else {
                     alert("Error al eliminar la factura: " + data.error);
                 }
